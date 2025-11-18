@@ -1,4 +1,6 @@
-import { createSlice, PayloadAction } from '@reduxjs/toolkit';
+// src/store/slices/uiSlice.ts
+
+import { createSlice, type PayloadAction } from '@reduxjs/toolkit'; // <-- PERBAIKAN DI SINI
 import type { RootState } from '../store';
 
 interface UIState {

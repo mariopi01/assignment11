@@ -1,8 +1,10 @@
+
 // import axios from 'axios';
 // import { store } from '../store/store'; // Impor store Redux
+// import type { RootState } from '../store/store'; // <--- 1. TAMBAHKAN IMPORT TIPE INI
 
 // // Ganti dengan URL API Anda yang sebenarnya
-// const API_BASE_URL = 'https://api.yourlibrary.com/v1';
+// const API_BASE_URL = 'https://be-library-api-xh3x6c5iiq-et.a.run.app/api';
 
 // const apiClient = axios.create({
 //   baseURL: API_BASE_URL,
@@ -12,8 +14,9 @@
 // apiClient.interceptors.request.use(
 //   (config) => {
 //     // Ambil token dari Redux state
-//     const token = store.getState().auth.token;
-    
+//     const state = store.getState() as RootState; // <--- 2. CASTING STATE KE ROOTSTATE
+//     const token = state.auth.token; // <--- 3. SEKARANG 'state' DIKENALI
+
 //     // Jika token ada, tambahkan ke header Authorization
 //     if (token) {
 //       config.headers.Authorization = `Bearer ${token}`;
@@ -33,7 +36,7 @@ import { store } from '../store/store'; // Impor store Redux
 import type { RootState } from '../store/store'; // <--- 1. TAMBAHKAN IMPORT TIPE INI
 
 // Ganti dengan URL API Anda yang sebenarnya
-const API_BASE_URL = 'https://api.yourlibrary.com/v1';
+const API_BASE_URL = 'https://be-library-api-xh3x6c5iiq-et.a.run.app/api';
 
 const apiClient = axios.create({
   baseURL: API_BASE_URL,
