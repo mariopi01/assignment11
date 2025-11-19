@@ -1,76 +1,799 @@
 
+// // // import { useState } from 'react';
+// // // import { useQuery } from '@tanstack/react-query';
+// // // import apiClient from '@/api';
+// // // import { cn } from '@/lib/utils';
+// // // import { Button } from '@/components/ui/button';
+// // // import { Card } from '@/components/ui/card';
+// // // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+// // // import { TriangleAlert, Loader2, Star, BookOpen } from 'lucide-react'; // Tambahkan BookOpen
+// // // import type { Book } from '@/types';
+
+// // // // --- TIPE DATA API (didasarkan pada respons Anda) ---
+// // // interface Author { id: number; name: string; }
+// // // interface RecommendedBook extends Omit<Book, 'author' | 'category' | 'id' | 'coverImageUrl'> {
+// // //     id: number;
+// // //     title: string;
+// // //     coverImage: string | null;
+// // //     rating: number;
+// // //     author: Author;
+// // //     category: {
+// // //       id: number;
+// // //       name: string;
+// // //     };
+// // //     description: string;
+// // //     isbn: string;
+// // //     publishedYear: number;
+// // //     reviewCount: number;
+// // //     totalCopies: number;
+// // //     availableCopies: number;
+// // //     borrowCount: number;
+// // // }
+// // // interface RecommendedBooksResponse {
+// // //     mode: string;
+// // //     books: RecommendedBook[];
+// // // }
+// // // // ----------------------------------------------------
+
+// // // // Komponen Pembantu: Star Icon
+// // // const StarIcon = ({ filled }: { filled: boolean }) => (
+// // //     <Star 
+// // //         className={cn("w-4 h-4", filled ? "fill-yellow-500 text-yellow-500" : "text-gray-300")} 
+// // //         fill={filled ? "currentColor" : "none"}
+// // //     />
+// // // );
+
+// // // // Komponen Pembantu: Card Rekomendasi Khusus
+// // // const RecommendationCard = ({ book }: { book: RecommendedBook }) => {
+// // //     const customWidth = '224px';
+// // //     const customHeight = '468px';
+// // //     const coverHeight = '336px';
+
+// // //     return (
+// // //         <Card className="p-0 border overflow-hidden transition-shadow hover:shadow-lg"
+// // //               style={{ width: customWidth, height: customHeight, borderRadius: '12px' }}>
+            
+// // //             <div style={{ width: customWidth, height: coverHeight }} 
+// // //                  className="flex items-center justify-center bg-gray-200">
+// // //                 {book.coverImage ? (
+// // //                     <img
+// // //                         src={book.coverImage}
+// // //                         alt={book.title}
+// // //                         className="w-full h-full object-cover"
+// // //                         style={{ borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
+// // //                     />
+// // //                 ) : (
+// // //                     // PERBAIKAN: Fallback lokal menggunakan BookOpen icon
+// // //                     <BookOpen className="w-16 h-16 text-gray-500" />
+// // //                 )}
+// // //             </div>
+            
+// // //             <div className="p-4 flex flex-col space-y-1 text-left">
+// // //                 <h3 className="font-bold text-lg leading-normal truncate text-foreground" 
+// // //                     style={{ letterSpacing: '-0.03em' }}>
+// // //                     {book.title}
+// // //                 </h3>
+                
+// // //                 <p className="font-medium text-base text-muted-foreground truncate text-left"
+// // //                    style={{ letterSpacing: '-0.03em' }}>
+// // //                     {book.author.name}
+// // //                 </p>
+
+// // //                 <div className="flex  space-x-1 pt-2">
+// // //                     {Array.from({ length: 5 }).map((_, i) => (
+// // //                         <StarIcon key={i} filled={i < book.rating} />
+// // //                     ))}
+// // //                     <span className="text-sm font-semibold text-foreground ml-1">
+// // //                         {book.rating}/5
+// // //                     </span>
+// // //                 </div>
+// // //             </div>
+// // //         </Card>
+// // //     );
+// // // };
+
+
+// // // // PERBAIKAN: Menggunakan named export 'export const Recommendation'
+// // // export const Recommendation = () => {
+// // //     const INITIAL_LIMIT = 10;
+// // //     const LIMIT_INCREMENT = 10;
+
+// // //     const [limit, setLimit] = useState(INITIAL_LIMIT);
+    
+// // //     // Hardcoded parameters, can be made dynamic
+// // //     // const categoryId = 1; <-- DIHAPUS
+
+// // //     const { data, isPending, isError, error, isFetching } = useQuery<RecommendedBooksResponse, Error>({
+// // //         queryKey: ['recommended-books', limit],
+// // //         queryFn: async () => {
+// // //             const res = await apiClient.get('/books/recommend', {
+// // //                 params: {
+// // //                     by: 'rating',
+// // //                     // categoryId: categoryId, <-- DIHAPUS
+// // //                     limit: limit,
+// // //                 }
+// // //             });
+// // //             return res.data.data;
+// // //         },
+// // //     });
+
+// // //     const handleLoadMore = () => {
+// // //         setLimit(prevLimit => prevLimit + LIMIT_INCREMENT);
+// // //     };
+
+// // //     const books = data?.books || [];
+// // //     const hasMore = books.length % LIMIT_INCREMENT === 0 && books.length > 0; 
+    
+// // //     const isLoadingInitial = isPending && !isFetching;
+
+// // //     return (
+// // //         <div className="space-y-6">
+// // //             {/* 1. Title: "Recommendation" */}
+// // //             <h2 className="font-extrabold text-[#0A0D12] text-left" 
+// // //                 style={{ fontSize: '3rem', lineHeight: '1.2' }}>
+// // //                 Recommendation
+// // //             </h2>
+            
+// // //             {/* Loading/Error States */}
+// // //             {isLoadingInitial && (
+// // //                 <div className="text-center p-4">
+// // //                     <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+// // //                     <p>Loading recommendations...</p>
+// // //                 </div>
+// // //             )}
+            
+// // //             {isError && (
+// // //                 <Alert variant="destructive">
+// // //                     <TriangleAlert className="h-4 w-4" />
+// // //                     <AlertTitle>Error</AlertTitle>
+// // //                     <AlertDescription>{error?.message || 'Gagal memuat rekomendasi buku.'}</AlertDescription>
+// // //                 </Alert>
+// // //             )}
+
+// // //             {/* 2. Book Grid: 5 columns (desktop), 2 rows default (10 items) */}
+// // //             {(!isLoadingInitial && books.length > 0) && (
+// // //                  <div className={cn(
+// // //                     "grid gap-6",
+// // //                     "lg:grid-cols-5",
+// // //                     "grid-cols-2 sm:grid-cols-3" 
+// // //                 )}>
+// // //                     {books.map((book) => (
+// // //                         <RecommendationCard key={book.id} book={book} />
+// // //                     ))}
+                    
+// // //                     {/* Skeleton/Loading placeholder when fetching more */}
+// // //                     {isFetching && (
+// // //                          Array.from({ length: LIMIT_INCREMENT }).map((_, index) => (
+// // //                             <div key={`skeleton-${index}`} className="animate-pulse bg-gray-200 rounded-xl"
+// // //                                 style={{ width: '224px', height: '468px' }}>
+// // //                                 <div className="bg-gray-300 w-full" style={{ height: '336px' }}></div>
+// // //                                 <div className="p-4 space-y-2">
+// // //                                     <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+// // //                                     <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+// // //                                     <div className="h-4 bg-gray-300 rounded w-1/3 pt-2"></div>
+// // //                                 </div>
+// // //                             </div>
+// // //                         ))
+// // //                     )}
+// // //                 </div>
+// // //             )}
+
+// // //             {/* 3. Load More Button */}
+// // //             {hasMore && !isLoadingInitial && !isError && !isFetching && (
+// // //                 <div className="text-center pt-4">
+// // //                     <Button 
+// // //                         onClick={handleLoadMore} 
+// // //                         disabled={isFetching}
+// // //                         variant="outline"
+// // //                         className={cn(
+// // //                             "w-[200px] h-12 rounded-full text-base", 
+// // //                             "border border-[#D5D7DA] bg-white hover:bg-gray-50 transition-colors"
+// // //                         )}
+// // //                     >
+// // //                         Load More
+// // //                     </Button>
+// // //                 </div>
+// // //             )}
+
+// // //             {books.length === 0 && !isPending && !isError && (
+// // //                 <p className="text-center text-muted-foreground p-4">Tidak ada rekomendasi buku saat ini.</p>
+// // //             )}
+// // //         </div>
+// // //     );
+// // // };
+
+
+// // import { useState } from 'react';
+// // import { useQuery } from '@tanstack/react-query';
+// // import apiClient from '@/api';
+// // import { cn } from '@/lib/utils';
+// // import { Button } from '@/components/ui/button';
+// // import { Card } from '@/components/ui/card';
+// // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+// // import { TriangleAlert, Loader2, Star, BookOpen } from 'lucide-react';
+// // import type { Book } from '@/types';
+
+// // // --- TIPE DATA API (didasarkan pada respons Anda) ---
+// // interface Author { id: number; name: string; }
+// // interface RecommendedBook extends Omit<Book, 'author' | 'category' | 'id' | 'coverImageUrl'> {
+// //     id: number;
+// //     title: string;
+// //     coverImage: string | null;
+// //     rating: number;
+// //     author: Author;
+// //     category: {
+// //       id: number;
+// //       name: string;
+// //     };
+// //     description: string;
+// //     isbn: string;
+// //     publishedYear: number;
+// //     reviewCount: number;
+// //     totalCopies: number;
+// //     availableCopies: number;
+// //     borrowCount: number;
+// // }
+// // interface RecommendedBooksResponse {
+// //     mode: string;
+// //     books: RecommendedBook[];
+// // }
+// // // ----------------------------------------------------
+
+// // // Komponen Pembantu: Star Icon
+// // const StarIcon = ({ filled }: { filled: boolean }) => (
+// //     <Star 
+// //         className={cn("w-4 h-4", filled ? "fill-yellow-500 text-yellow-500" : "text-gray-300")} 
+// //         fill={filled ? "currentColor" : "none"}
+// //     />
+// // );
+
+// // // Komponen Pembantu: Card Rekomendasi Khusus
+// // const RecommendationCard = ({ book }: { book: RecommendedBook }) => {
+// //     const customWidth = '224px';
+// //     const customHeight = '468px';
+// //     const coverHeight = '336px';
+
+// //     return (
+// //         <Card className="p-0 border overflow-hidden transition-shadow hover:shadow-lg"
+// //               style={{ width: customWidth, height: customHeight, borderRadius: '12px' }}>
+            
+// //             <div style={{ width: customWidth, height: coverHeight }} 
+// //                  className="flex items-center justify-center bg-gray-200">
+// //                 {book.coverImage ? (
+// //                     <img
+// //                         src={book.coverImage}
+// //                         alt={book.title}
+// //                         className="w-full h-full object-cover"
+// //                         style={{ borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
+// //                     />
+// //                 ) : (
+// //                     <BookOpen className="w-16 h-16 text-gray-500" />
+// //                 )}
+// //             </div>
+            
+// //             <div className="p-4 flex flex-col space-y-1">
+// //                 <h3 className="font-bold text-lg leading-normal truncate text-foreground text-left" 
+// //                     style={{ letterSpacing: '-0.03em' }}>
+// //                     {book.title}
+// //                 </h3>
+                
+// //                 <p className="font-medium text-base text-muted-foreground truncate text-left"
+// //                    style={{ letterSpacing: '-0.03em' }}>
+// //                     {book.author.name}
+// //                 </p>
+
+// //                 <div className="flex items-center space-x-1 pt-2">
+// //                     {Array.from({ length: 5 }).map((_, i) => (
+// //                         <StarIcon key={i} filled={i < book.rating} />
+// //                     ))}
+// //                     <span className="text-sm font-semibold text-foreground ml-1">
+// //                         {book.rating}/5
+// //                     </span>
+// //                 </div>
+// //             </div>
+// //         </Card>
+// //     );
+// // };
+
+
+// // // PERBAIKAN: Menggunakan named export 'export const Recommendation'
+// // export const Recommendation = () => {
+// //     const INITIAL_LIMIT = 10;
+// //     const LIMIT_INCREMENT = 10;
+
+// //     const [limit, setLimit] = useState(INITIAL_LIMIT);
+    
+// //     const { data, isPending, isError, error, isFetching } = useQuery<RecommendedBooksResponse, Error>({
+// //         queryKey: ['recommended-books', limit],
+// //         queryFn: async () => {
+// //             const res = await apiClient.get('/books/recommend', {
+// //                 params: {
+// //                     by: 'rating',
+// //                     limit: limit,
+// //                 }
+// //             });
+// //             return res.data.data;
+// //         },
+// //     });
+
+// //     const handleLoadMore = () => {
+// //         setLimit(prevLimit => prevLimit + LIMIT_INCREMENT);
+// //     };
+
+// //     const books = data?.books || [];
+    
+// //     // PERBAIKAN LOGIKA HASMORE
+// //     // Tombol hanya muncul jika jumlah buku yang diterima sama dengan limit yang diminta,
+// //     // menandakan bahwa ada kemungkinan lebih banyak data.
+// //     const hasMore = books.length === limit; 
+    
+// //     const isLoadingInitial = isPending && !isFetching;
+
+// //     return (
+// //         <div className="space-y-6">
+// //             {/* 1. Title: "Recommendation" */}
+// //             <h2 className="font-extrabold text-[#0A0D12] text-left" 
+// //                 style={{ fontSize: '3rem', lineHeight: '1.2' }}>
+// //                 Recommendation
+// //             </h2>
+            
+// //             {/* Loading/Error States */}
+// //             {isLoadingInitial && (
+// //                 <div className="text-center p-4">
+// //                     <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+// //                     <p>Loading recommendations...</p>
+// //                 </div>
+// //             )}
+            
+// //             {isError && (
+// //                 <Alert variant="destructive">
+// //                     <TriangleAlert className="h-4 w-4" />
+// //                     <AlertTitle>Error</AlertTitle>
+// //                     <AlertDescription>{error?.message || 'Gagal memuat rekomendasi buku.'}</AlertDescription>
+// //                 </Alert>
+// //             )}
+
+// //             {/* 2. Book Grid: 5 columns (desktop), 2 rows default (10 items) */}
+// //             {(!isLoadingInitial && books.length > 0) && (
+// //                  <div className={cn(
+// //                     "grid gap-6",
+                  
+// //                     "md:grid-cols-5 grid-cols-2" 
+// //                 )}>
+// //                     {books.map((book) => (
+// //                         <RecommendationCard key={book.id} book={book} />
+// //                     ))}
+                    
+// //                     {/* Skeleton/Loading placeholder when fetching more */}
+// //                     {isFetching && (
+// //                          Array.from({ length: LIMIT_INCREMENT }).map((_, index) => (
+// //                             <div key={`skeleton-${index}`} className="animate-pulse bg-gray-200 rounded-xl"
+// //                                 style={{ width: '224px', height: '468px' }}>
+// //                                 <div className="bg-gray-300 w-full" style={{ height: '336px' }}></div>
+// //                                 <div className="p-4 space-y-2">
+// //                                     <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+// //                                     <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+// //                                     <div className="h-4 bg-gray-300 rounded w-1/3 pt-2"></div>
+// //                                 </div>
+// //                             </div>
+// //                         ))
+// //                     )}
+// //                 </div>
+// //             )}
+
+// //             {/* 3. Load More Button */}
+// //             {hasMore && !isLoadingInitial && !isError && !isFetching && (
+// //                 <div className="text-center pt-4">
+// //                     <Button 
+// //                         onClick={handleLoadMore} 
+// //                         disabled={isFetching}
+// //                         variant="outline"
+// //                         className={cn(
+// //                             "w-[200px] h-12 rounded-full text-base", 
+// //                             "border border-[#D5D7DA] bg-white hover:bg-gray-50 transition-colors"
+// //                         )}
+// //                     >
+// //                         {isFetching ? 'Loading...' : 'Load More'}
+// //                     </Button>
+// //                 </div>
+// //             )}
+
+// //             {books.length === 0 && !isPending && !isError && (
+// //                 <p className="text-center text-muted-foreground p-4">Tidak ada rekomendasi buku saat ini.</p>
+// //             )}
+// //         </div>
+// //     );
+// // };
+
+
+// import { useState } from 'react';
+// import { useQuery } from '@tanstack/react-query';
+// import apiClient from '@/api';
+// import { cn } from '@/lib/utils';
+// import { Button } from '@/components/ui/button';
+// import { Card } from '@/components/ui/card';
+// import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+// import { TriangleAlert, Loader2, Star, BookOpen } from 'lucide-react';
+// import type { Book } from '@/types';
+
+// // --- TIPE DATA API (didasarkan pada respons Anda) ---
+// interface Author { id: number; name: string; }
+// interface RecommendedBook extends Omit<Book, 'author' | 'category' | 'id' | 'coverImageUrl'> {
+//     id: number;
+//     title: string;
+//     coverImage: string | null;
+//     rating: number;
+//     author: Author;
+//     category: {
+//       id: number;
+//       name: string;
+//     };
+//     description: string;
+//     isbn: string;
+//     publishedYear: number;
+//     reviewCount: number;
+//     totalCopies: number;
+//     availableCopies: number;
+//     borrowCount: number;
+// }
+// interface RecommendedBooksResponse {
+//     mode: string;
+//     books: RecommendedBook[];
+// }
+// // ----------------------------------------------------
+
+// // Komponen Pembantu: Star Icon
+// const StarIcon = ({ filled }: { filled: boolean }) => (
+//     <Star 
+//         className={cn("w-4 h-4", filled ? "fill-yellow-500 text-yellow-500" : "text-gray-300")} 
+//         fill={filled ? "currentColor" : "none"}
+//     />
+// );
+
+// // Komponen Pembantu: Card Rekomendasi Khusus
+// const RecommendationCard = ({ book }: { book: RecommendedBook }) => {
+//     // Menghapus customWidth dan customHeight. Lebar diatur oleh grid.
+    
+//     // Aspek rasio gambar cover adalah 224px:336px, atau 2:3.
+//     const coverAspectRatio = '2/3'; 
+
+//     return (
+//         // Card kini menggunakan w-full (fleksibel) dan tinggi otomatis (h-full).
+//         <Card className="p-0 border overflow-hidden transition-shadow hover:shadow-lg w-full h-full rounded-xl">
+            
+//             {/* Cover Image Container: Gunakan aspect-[2/3] agar proporsionalitas tetap terjaga saat mengecil */}
+//             <div className={`relative w-full aspect-[${coverAspectRatio}] flex items-center justify-center bg-gray-200`}>
+//                 {book.coverImage ? (
+//                     <img
+//                         src={book.coverImage}
+//                         alt={book.title}
+//                         className="w-full h-full object-cover"
+//                         style={{ borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
+//                     />
+//                 ) : (
+//                     // Fallback lokal
+//                     <BookOpen className="w-16 h-16 text-gray-500" />
+//                 )}
+//             </div>
+            
+//             <div className="p-4 flex flex-col space-y-1">
+//                 <h3 className="font-bold text-lg leading-normal truncate text-foreground text-left" 
+//                     style={{ letterSpacing: '-0.03em' }}>
+//                     {book.title}
+//                 </h3>
+                
+//                 <p className="font-medium text-base text-muted-foreground truncate text-left"
+//                    style={{ letterSpacing: '-0.03em' }}>
+//                     {book.author.name}
+//                 </p>
+
+//                 <div className="flex items-center space-x-1 pt-2">
+//                     {Array.from({ length: 5 }).map((_, i) => (
+//                         <StarIcon key={i} filled={i < book.rating} />
+//                     ))}
+//                     <span className="text-sm font-semibold text-foreground ml-1">
+//                         {book.rating}/5
+//                     </span>
+//                 </div>
+//             </div>
+//         </Card>
+//     );
+// };
+
+
+// // PERBAIKAN: Menggunakan named export 'export const Recommendation'
+// export const Recommendation = () => {
+//     const INITIAL_LIMIT = 10;
+//     const LIMIT_INCREMENT = 10;
+
+//     const [limit, setLimit] = useState(INITIAL_LIMIT);
+    
+//     const { data, isPending, isError, error, isFetching } = useQuery<RecommendedBooksResponse, Error>({
+//         queryKey: ['recommended-books', limit],
+//         queryFn: async () => {
+//             const res = await apiClient.get('/books/recommend', {
+//                 params: {
+//                     by: 'rating',
+//                     limit: limit,
+//                 }
+//             });
+//             return res.data.data;
+//         },
+//     });
+
+//     const handleLoadMore = () => {
+//         setLimit(prevLimit => prevLimit + LIMIT_INCREMENT);
+//     };
+
+//     const books = data?.books || [];
+    
+//     // Logika hasMore yang disederhanakan
+//     const hasMore = books.length === limit; 
+    
+//     const isLoadingInitial = isPending && !isFetching;
+
+//     return (
+//         <div className="space-y-6">
+//             {/* 1. Title: "Recommendation" */}
+//             <h2 className="font-extrabold text-[#0A0D12] text-left" 
+//                 style={{ fontSize: '3rem', lineHeight: '1.2' }}>
+//                 Recommendation
+//             </h2>
+            
+//             {/* Loading/Error States */}
+//             {isLoadingInitial && (
+//                 <div className="text-center p-4">
+//                     <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+//                     <p>Loading recommendations...</p>
+//                 </div>
+//             )}
+            
+//             {isError && (
+//                 <Alert variant="destructive">
+//                     <TriangleAlert className="h-4 w-4" />
+//                     <AlertTitle>Error</AlertTitle>
+//                     <AlertDescription>{error?.message || 'Gagal memuat rekomendasi buku.'}</AlertDescription>
+//                 </Alert>
+//             )}
+
+//             {/* 2. Book Grid: 5 columns (desktop), 2 rows default (10 items) */}
+//             {(!isLoadingInitial && books.length > 0) && (
+//                  <div className={cn(
+//                     "grid gap-6",
+//                     "lg:grid-cols-5",
+//                     "grid-cols-2 sm:grid-cols-3" 
+//                 )}>
+//                     {books.map((book) => (
+//                         <RecommendationCard key={book.id} book={book} />
+//                     ))}
+                    
+//                     {/* Skeleton/Loading placeholder when fetching more */}
+//                     {isFetching && (
+//                          Array.from({ length: LIMIT_INCREMENT }).map((_, index) => (
+//                             <div key={`skeleton-${index}`} className="animate-pulse bg-gray-200 rounded-xl"
+//                                 style={{ width: '224px', height: '468px' }}>
+//                                 <div className="bg-gray-300 w-full" style={{ height: '336px' }}></div>
+//                                 <div className="p-4 space-y-2">
+//                                     <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+//                                     <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+//                                     <div className="h-4 bg-gray-300 rounded w-1/3 pt-2"></div>
+//                                 </div>
+//                             </div>
+//                         ))
+//                     )}
+//                 </div>
+//             )}
+
+//             {/* 3. Load More Button */}
+//             {hasMore && !isLoadingInitial && !isError && !isFetching && (
+//                 <div className="text-center pt-4">
+//                     <Button 
+//                         onClick={handleLoadMore} 
+//                         disabled={isFetching}
+//                         variant="outline"
+//                         className={cn(
+//                             "w-[200px] h-12 rounded-full text-base", 
+//                             "border border-[#D5D7DA] bg-white hover:bg-gray-50 transition-colors"
+//                         )}
+//                     >
+//                         {isFetching ? 'Loading...' : 'Load More'}
+//                     </Button>
+//                 </div>
+//             )}
+
+//             {books.length === 0 && !isPending && !isError && (
+//                 <p className="text-center text-muted-foreground p-4">Tidak ada rekomendasi buku saat ini.</p>
+//             )}
+//         </div>
+//     );
+// };
+
+
+import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api';
-import type { Book } from '@/types';
-import { BookCard } from './BookCard';
-import { Loader2, TriangleAlert } from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
+import { Card } from '@/components/ui/card';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { TriangleAlert, Loader2, Star, BookOpen } from 'lucide-react';
+import type { Book } from '@/types';
 
-// Tipe data dari API /api/books/recommend
-interface RecommendResponse {
-  mode: string;
-  books: Book[];
+// --- TIPE DATA API (didasarkan pada respons Anda) ---
+interface Author { id: number; name: string; }
+interface RecommendedBook extends Omit<Book, 'author' | 'category' | 'id' | 'coverImageUrl'> {
+    id: number;
+    title: string;
+    coverImage: string | null;
+    rating: number;
+    author: Author;
+    category: {
+      id: number;
+      name: string;
+    };
+    description: string;
+    isbn: string;
+    publishedYear: number;
+    reviewCount: number;
+    totalCopies: number;
+    availableCopies: number;
+    borrowCount: number;
 }
-
-// Tipe data lengkap dari API
-interface ApiResponse {
-  success: boolean;
-  message: string;
-  data: RecommendResponse;
+interface RecommendedBooksResponse {
+    mode: string;
+    books: RecommendedBook[];
 }
+// ----------------------------------------------------
 
-const LoadingSpinner = () => (
-  <div className="text-center py-8">
-    <Loader2 className="h-8 w-8 animate-spin inline-block" />
-  </div>
+// Komponen Pembantu: Star Icon (Tetap sama, tapi hanya akan dipanggil sekali)
+const StarIcon = ({ filled }: { filled: boolean }) => (
+    <Star 
+        className={cn("w-4 h-4", filled ? "fill-yellow-500 text-yellow-500" : "text-gray-300")} 
+        fill={filled ? "currentColor" : "none"}
+    />
 );
 
-const ErrorDisplay = ({ message }: { message: string }) => (
-  <Alert variant="destructive">
-    <TriangleAlert className="h-4 w-4" />
-    <AlertTitle>Error</AlertTitle>
-    <AlertDescription>{message}</AlertDescription>
-  </Alert>
-);
+// Komponen Pembantu: Card Rekomendasi Khusus
+const RecommendationCard = ({ book }: { book: RecommendedBook }) => {
+    const coverAspectRatio = '2/3'; 
+
+    return (
+        <Card className="p-0 border overflow-hidden transition-shadow hover:shadow-lg w-full h-full rounded-xl">
+            
+            <div className={`relative w-full aspect-[${coverAspectRatio}] flex items-center justify-center bg-gray-200`}>
+                {book.coverImage ? (
+                    <img
+                        src={book.coverImage}
+                        alt={book.title}
+                        className="w-full h-full object-cover"
+                        style={{ borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
+                    />
+                ) : (
+                    <BookOpen className="w-16 h-16 text-gray-500" />
+                )}
+            </div>
+            
+            <div className="p-4 flex flex-col space-y-1">
+                <h3 className="font-bold text-lg leading-normal truncate text-foreground text-left" 
+                    style={{ letterSpacing: '-0.03em' }}>
+                    {book.title}
+                </h3>
+                
+                <p className="font-medium text-base text-muted-foreground truncate text-left"
+                   style={{ letterSpacing: '-0.03em' }}>
+                    {book.author.name}
+                </p>
+
+                {/* PERUBAHAN DI SINI: Hanya menampilkan satu bintang dan nilai rating */}
+                <div className="flex items-center space-x-1 pt-2">
+                    {/* Tampilkan StarIcon yang 'terisi' jika rating > 0, jika tidak, kosong */}
+                    <StarIcon filled={book.rating > 0} /> 
+                    <span className="text-sm font-semibold text-foreground ml-1">
+                        {book.rating}/5 {/* Menampilkan nilai rating dan maksimumnya */}
+                    </span>
+                </div>
+            </div>
+        </Card>
+    );
+};
+
 
 export const Recommendation = () => {
-  // Fetch 4 buku rekomendasi berdasarkan rating
-  const { data, isPending, isError, error } = useQuery<ApiResponse, Error>({
-    queryKey: ['recommendations', 'rating'],
-    queryFn: async () => {
-      const res = await apiClient.get('/books/recommend', {
-        params: {
-          by: 'rating',
-          limit: 4,
+    const INITIAL_LIMIT = 10;
+    const LIMIT_INCREMENT = 10;
+
+    const [limit, setLimit] = useState(INITIAL_LIMIT);
+    
+    const { data, isPending, isError, error, isFetching } = useQuery<RecommendedBooksResponse, Error>({
+        queryKey: ['recommended-books', limit],
+        queryFn: async () => {
+            const res = await apiClient.get('/books/recommend', {
+                params: {
+                    by: 'rating',
+                    limit: limit,
+                }
+            });
+            return res.data.data;
         },
-      });
-      return res.data; // Mengembalikan seluruh respons API
-    },
-  });
+    });
 
-  const renderContent = () => {
-    if (isPending) return <LoadingSpinner />;
-    if (isError) return <ErrorDisplay message={error.message || 'Gagal memuat rekomendasi.'} />;
+    const handleLoadMore = () => {
+        setLimit(prevLimit => prevLimit + LIMIT_INCREMENT);
+    };
 
-    // Mengakses data buku dari dalam 'data.data.books'
-    const books = data?.data?.books;
+    const books = data?.books || [];
+    
+    const hasMore = books.length === limit; 
+    
+    const isLoadingInitial = isPending && !isFetching;
 
-    if (books && books.length > 0) {
-      return (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {books.map((book) => (
-            <BookCard key={book.id} book={book} />
-          ))}
+    return (
+        <div className="space-y-6">
+            <h2 className="font-extrabold text-[#0A0D12] text-left" 
+                style={{ fontSize: '3rem', lineHeight: '1.2' }}>
+                Recommendation
+            </h2>
+            
+            {isLoadingInitial && (
+                <div className="text-center p-4">
+                    <Loader2 className="h-6 w-6 animate-spin mx-auto" />
+                    <p>Loading recommendations...</p>
+                </div>
+            )}
+            
+            {isError && (
+                <Alert variant="destructive">
+                    <TriangleAlert className="h-4 w-4" />
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>{error?.message || 'Gagal memuat rekomendasi buku.'}</AlertDescription>
+                </Alert>
+            )}
+
+            {(!isLoadingInitial && books.length > 0) && (
+                 <div className={cn(
+                    "grid gap-6",
+                    "lg:grid-cols-5",
+                    "grid-cols-2 sm:grid-cols-3" 
+                )}>
+                    {books.map((book) => (
+                        <RecommendationCard key={book.id} book={book} />
+                    ))}
+                    
+                    {isFetching && (
+                         Array.from({ length: LIMIT_INCREMENT }).map((_, index) => (
+                            <div key={`skeleton-${index}`} className="animate-pulse bg-gray-200 rounded-xl"
+                                style={{ width: '224px', height: '468px' }}>
+                                <div className="bg-gray-300 w-full" style={{ height: '336px' }}></div>
+                                <div className="p-4 space-y-2">
+                                    <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                                    <div className="h-4 bg-gray-300 rounded w-1/2"></div>
+                                    <div className="h-4 bg-gray-300 rounded w-1/3 pt-2"></div>
+                                </div>
+                            </div>
+                        ))
+                    )}
+                </div>
+            )}
+
+            {hasMore && !isLoadingInitial && !isError && !isFetching && (
+                <div className="text-center pt-4">
+                    <Button 
+                        onClick={handleLoadMore} 
+                        disabled={isFetching}
+                        variant="outline"
+                        className={cn(
+                            "w-[200px] h-12 rounded-full text-base", 
+                            "border border-[#D5D7DA] bg-white hover:bg-gray-50 transition-colors"
+                        )}
+                    >
+                        {isFetching ? 'Loading...' : 'Load More'}
+                    </Button>
+                </div>
+            )}
+
+            {books.length === 0 && !isPending && !isError && (
+                <p className="text-center text-muted-foreground p-4">Tidak ada rekomendasi buku saat ini.</p>
+            )}
         </div>
-      );
-    }
-    return <p className="text-center text-muted-foreground">Tidak ada buku rekomendasi.</p>;
-  };
-
-  return (
-    <div className="space-y-6">
-      <h2 className="text-3xl font-bold">Rekomendasi Teratas</h2>
-      {renderContent()}
-    </div>
-  );
+    );
 };

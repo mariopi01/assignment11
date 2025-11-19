@@ -1,3 +1,382 @@
+// // // // // import { useQuery } from '@tanstack/react-query';
+// // // // // import apiClient from '@/api';
+// // // // // import { useAppDispatch, useAppSelector } from '@/store/hooks';
+// // // // // import { selectFilters, setFilterCategory, setSearchTerm } from '@/store/slices/uiSlice';
+// // // // // import type { Book } from '@/types';
+
+// // // // // // Komponen & UI
+// // // // // import { Input } from '@/components/ui/input';
+// // // // // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// // // // // import { BookCard } from '@/components/features/BookCard';
+// // // // // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+// // // // // import { TriangleAlert } from 'lucide-react';
+
+// // // // // // Dummies, Anda bisa ganti dengan komponen loading/error yang lebih baik
+// // // // // const LoadingSpinner = () => <div className="text-center">Loading books...</div>;
+// // // // // const ErrorDisplay = ({ message }: { message: string }) => (
+// // // // //   <Alert variant="destructive">
+// // // // //     <TriangleAlert className="h-4 w-4" />
+// // // // //     <AlertTitle>Error</AlertTitle>
+// // // // //     <AlertDescription>{message}</AlertDescription>
+// // // // //   </Alert>
+// // // // // );
+
+// // // // // // Asumsi API mengembalikan { books: Book[], categories: string[] }
+// // // // // interface BooksResponse {
+// // // // //   books: Book[];
+// // // // //   categories: string[];
+// // // // // }
+
+// // // // // export default function BookListPage() {
+// // // // //   const dispatch = useAppDispatch();
+// // // // //   const { filterCategory, searchTerm } = useAppSelector(selectFilters);
+
+// // // // //   // === DATA FETCHING (TanStack Query) ===
+// // // // //   const { data, isPending, isError, error } = useQuery<BooksResponse, Error>({
+// // // // //     // Kunci query ini akan otomatis memperbarui data ketika filter/search berubah
+// // // // //     queryKey: ['books', filterCategory, searchTerm],
+// // // // //     queryFn: async () => {
+// // // // //       const params: any = {};
+// // // // //       if (filterCategory !== 'all') {
+// // // // //         params.category = filterCategory;
+// // // // //       }
+// // // // //       if (searchTerm) {
+// // // // //         params.search = searchTerm;
+// // // // //       }
+// // // // //       const res = await apiClient.get('/books', { params });
+// // // // //       return res.data;
+// // // // //     },
+// // // // //     // Menjaga data sebelumnya terlihat saat data baru di-fetch
+// // // // //     placeholderData: (previousData) => previousData, 
+// // // // //   });
+
+// // // // //   // Handler untuk UI
+// // // // //   const handleCategoryChange = (value: string) => {
+// // // // //     dispatch(setFilterCategory(value));
+// // // // //   };
+
+// // // // //   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+// // // // //     dispatch(setSearchTerm(e.target.value));
+// // // // //   };
+
+// // // // //   // === RENDER LOGIC ===
+// // // // //   const renderContent = () => {
+// // // // //     if (isPending) {
+// // // // //       return <LoadingSpinner />;
+// // // // //     }
+// // // // //     if (isError) {
+// // // // //       return <ErrorDisplay message={error.message || 'Gagal memuat buku.'} />;
+// // // // //     }
+// // // // //     if (data && data.books.length > 0) {
+// // // // //       return (
+// // // // //         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+// // // // //           {data.books.map((book) => (
+// // // // //             <BookCard key={book.id} book={book} />
+// // // // //           ))}
+// // // // //         </div>
+// // // // //       );
+// // // // //     }
+// // // // //     return <p className="text-center text-muted-foreground">Tidak ada buku yang ditemukan.</p>;
+// // // // //   };
+
+// // // // //   return (
+// // // // //     <div className="space-y-8">
+// // // // //       <div className="flex flex-col md:flex-row gap-4">
+// // // // //         <Input
+// // // // //           placeholder="Cari berdasarkan judul atau penulis..."
+// // // // //           className="flex-grow"
+// // // // //           value={searchTerm}
+// // // // //           onChange={handleSearchChange}
+// // // // //         />
+// // // // //         <Select value={filterCategory} onValueChange={handleCategoryChange}>
+// // // // //           <SelectTrigger className="w-full md:w-[180px]">
+// // // // //             <SelectValue placeholder="Semua Kategori" />
+// // // // //           </SelectTrigger>
+// // // // //           <SelectContent>
+// // // // //             <SelectItem value="all">Semua Kategori</SelectItem>
+// // // // //             {/* Tampilkan kategori dari data API */}
+// // // // //             {data?.categories?.map((category) => (
+// // // // //               <SelectItem key={category} value={category}>
+// // // // //                 {category}
+// // // // //               </SelectItem>
+// // // // //             ))}
+// // // // //           </SelectContent>
+// // // // //         </Select>
+// // // // //       </div>
+
+// // // // //       {renderContent()}
+// // // // //     </div>
+// // // // //   );
+// // // // // }
+
+// // // // // src/pages/BookListPage.tsx
+
+// // // // import { useQuery } from '@tanstack/react-query';
+// // // // import apiClient from '@/api';
+// // // // import { useAppDispatch, useAppSelector } from '@/store/hooks';
+// // // // import { selectFilters, setFilterCategory, setSearchTerm } from '@/store/slices/uiSlice';
+// // // // import type { Book } from '@/types';
+
+// // // // // Komponen & UI
+// // // // import { Input } from '@/components/ui/input';
+// // // // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// // // // import { BookCard } from '@/components/features/BookCard';
+// // // // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+// // // // import { TriangleAlert } from 'lucide-react';
+
+// // // // // Dummies, Anda bisa ganti dengan komponen loading/error yang lebih baik
+// // // // const LoadingSpinner = () => <div className="text-center">Loading books...</div>;
+// // // // const ErrorDisplay = ({ message }: { message: string }) => (
+// // // //   <Alert variant="destructive">
+// // // //     <TriangleAlert className="h-4 w-4" />
+// // // //     <AlertTitle>Error</AlertTitle>
+// // // //     <AlertDescription>{message}</AlertDescription>
+// // // //   </Alert>
+// // // // );
+
+// // // // // Asumsi API mengembalikan { books: Book[], categories: string[] }
+// // // // interface BooksResponse {
+// // // //   books: Book[];
+// // // //   categories: string[];
+// // // // }
+
+// // // // export default function BookListPage() {
+// // // //   const dispatch = useAppDispatch();
+// // // //   const { filterCategory, searchTerm } = useAppSelector(selectFilters);
+
+// // // //   // === DATA FETCHING (TanStack Query) ===
+// // // //   const { data, isPending, isError, error } = useQuery<BooksResponse, Error>({
+// // // //     queryKey: ['books', filterCategory, searchTerm],
+// // // //     queryFn: async () => {
+// // // //       // PERBAIKAN 1: Ganti 'any' dengan 'Record<string, string>'
+// // // //       const params: Record<string, string> = {}; 
+// // // //       if (filterCategory !== 'all') {
+// // // //         params.category = filterCategory;
+// // // //       }
+// // // //       if (searchTerm) {
+// // // //         params.search = searchTerm;
+// // // //       }
+// // // //       const res = await apiClient.get('/books', { params });
+// // // //       return res.data;
+// // // //     },
+// // // //     placeholderData: (previousData) => previousData, 
+// // // //   });
+
+// // // //   // Handler untuk UI
+// // // //   const handleCategoryChange = (value: string) => {
+// // // //     dispatch(setFilterCategory(value));
+// // // //   };
+
+// // // //   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+// // // //     dispatch(setSearchTerm(e.target.value));
+// // // //   };
+
+// // // //   // === RENDER LOGIC ===
+// // // //   const renderContent = () => {
+// // // //     if (isPending) {
+// // // //       return <LoadingSpinner />;
+// // // //     }
+// // // //     if (isError) {
+// // // //       return <ErrorDisplay message={error.message || 'Gagal memuat buku.'} />;
+// // // //     }
+// // // //     if (data && data.books.length > 0) {
+// // // //       return (
+// // // //         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+// // // //           {data.books.map((book) => (
+// // // //             <BookCard key={book.id} book={book} />
+// // // //           ))}
+// // // //         </div>
+// // // //       );
+// // // //     }
+// // // //     return <p className="text-center text-muted-foreground">Tidak ada buku yang ditemukan.</p>;
+// // // //   };
+
+// // // //   return (
+// // // //     <div className="space-y-8">
+// // // //       <div className="flex flex-col md:flex-row gap-4">
+// // // //         <Input
+// // // //           placeholder="Cari berdasarkan judul atau penulis..."
+// // // //           // PERBAIKAN 2: Ganti 'flex-grow' dengan 'grow'
+// // // //           className="grow" 
+// // // //           value={searchTerm}
+// // // //           onChange={handleSearchChange}
+// // // //         />
+// // // //         <Select value={filterCategory} onValueChange={handleCategoryChange}>
+// // // //           <SelectTrigger className="w-full md:w-[180px]">
+// // // //             <SelectValue placeholder="Semua Kategori" />
+// // // //           </SelectTrigger>
+// // // //           <SelectContent>
+// // // //             <SelectItem value="all">Semua Kategori</SelectItem>
+// // // //             {data?.categories?.map((category) => (
+// // // //               <SelectItem key={category} value={category}>
+// // // //                 {category}
+// // // //               </SelectItem>
+// // // //             ))}
+// // // //           </SelectContent>
+// // // //         </Select>
+// // // //       </div>
+
+// // // //       {renderContent()}
+// // // //     </div>
+// // // //   );
+// // // // }
+
+
+// // // // src/pages/BookListPage.tsx
+
+// // // import { useQuery } from '@tanstack/react-query';
+// // // import apiClient from '@/api';
+// // // import { useAppDispatch, useAppSelector } from '@/store/hooks';
+// // // import { selectFilters, setFilterCategory, setSearchTerm } from '@/store/slices/uiSlice';
+// // // import type { Book } from '@/types';
+
+// // // // Komponen & UI
+// // // import { Input } from '@/components/ui/input';
+// // // import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+// // // import { BookCard } from '@/components/features/BookCard';
+// // // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+// // // import { TriangleAlert, Loader2 } from 'lucide-react'; // Loader2 diimpor
+
+// // // // Dummies, Anda bisa ganti dengan komponen loading/error yang lebih baik
+// // // const LoadingSpinner = () => (
+// // //   <div className="text-center">
+// // //     {/* Menggunakan Loader2 untuk konsistensi */}
+// // //     <Loader2 className="h-8 w-8 animate-spin inline-block" />
+// // //     <p>Loading books...</p>
+// // //   </div>
+// // // );
+
+// // // const ErrorDisplay = ({ message }: { message: string }) => (
+// // //   <Alert variant="destructive">
+// // //     <TriangleAlert className="h-4 w-4" />
+// // //     <AlertTitle>Error</AlertTitle>
+// // //     <AlertDescription>{message}</AlertDescription>
+// // //   </Alert>
+// // // );
+
+// // // // 1. Tipe data ini HANYA untuk data buku dari /api/books
+// // // interface BooksData {
+// // //   books: Book[];
+// // //   pagination: {
+// // //     page: number;
+// // //     limit: number;
+// // //     total: number;
+// // //     totalPages: number;
+// // //   };
+// // // }
+
+// // // // 2. Tipe data untuk kategori dari /api/categories
+// // // interface Category {
+// // //   id: number;
+// // //   name: string;
+// // // }
+
+// // // export default function BookListPage() {
+// // //   const dispatch = useAppDispatch();
+// // //   const { filterCategory, searchTerm } = useAppSelector(selectFilters);
+
+// // //   // === 3. DATA FETCHING BUKU ===
+// // //   const { 
+// // //     data: booksData, 
+// // //     isPending: isBooksPending, 
+// // //     isError: isBooksError, 
+// // //     error: booksError 
+// // //   } = useQuery<BooksData, Error>({ // Tipe diubah ke BooksData
+// // //     queryKey: ['books', filterCategory, searchTerm],
+// // //     queryFn: async () => {
+// // //       const params: Record<string, string> = {}; 
+// // //       if (filterCategory !== 'all') {
+// // //         // API mengharapkan categoryId (integer), bukan nama
+// // //         // Untuk saat ini kita tetap kirim string, asumsi backend bisa handle
+// // //         // Idealnya, state filterCategory menyimpan ID
+// // //         params.category = filterCategory;
+// // //       }
+// // //       if (searchTerm) {
+// // //         // API mengharapkan 'q' untuk search, bukan 'search'
+// // //         params.q = searchTerm; 
+// // //       }
+// // //       const res = await apiClient.get('/books', { params });
+// // //       // 4. Mengembalikan data yang TEPAT (res.data.data)
+// // //       return res.data.data; 
+// // //     },
+// // //     placeholderData: (previousData) => previousData, 
+// // //   });
+
+// // //   // === 5. DATA FETCHING KATEGORI ===
+// // //   const { data: categoriesData } = useQuery<{ categories: Category[] }, Error>({
+// // //     queryKey: ['categories'],
+// // //     queryFn: async () => {
+// // //       const res = await apiClient.get('/categories');
+// // //       // Mengembalikan data yang TEPAT (res.data.data)
+// // //       return res.data.data;
+// // //     },
+// // //   });
+
+
+// // //   // Handler untuk UI
+// // //   const handleCategoryChange = (value: string) => {
+// // //     dispatch(setFilterCategory(value));
+// // //   };
+
+// // //   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+// // //     dispatch(setSearchTerm(e.target.value));
+// // //   };
+
+// // //   // === 6. RENDER LOGIC DIPERBARUI ===
+// // //   const renderContent = () => {
+// // //     // Tampilkan loading jika salah satu query masih pending
+// // //     if (isBooksPending) {
+// // //       return <LoadingSpinner />;
+// // //     }
+// // //     if (isBooksError) {
+// // //       return <ErrorDisplay message={booksError.message || 'Gagal memuat buku.'} />;
+// // //     }
+// // //     // Cek data dari booksQuery
+// // //     if (booksData && booksData.books.length > 0) {
+// // //       return (
+// // //         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+// // //           {booksData.books.map((book) => (
+// // //             <BookCard key={book.id} book={book} />
+// // //           ))}
+// // //         </div>
+// // //       );
+// // //     }
+// // //     return <p className="text-center text-muted-foreground">Tidak ada buku yang ditemukan.</p>;
+// // //   };
+
+// // //   return (
+// // //     <div className="space-y-8">
+// // //       <div className="flex flex-col md:flex-row gap-4">
+// // //         <Input
+// // //           placeholder="Cari berdasarkan judul atau penulis..."
+// // //           className="grow" 
+// // //           value={searchTerm}
+// // //           onChange={handleSearchChange}
+// // //         />
+// // //         <Select value={filterCategory} onValueChange={handleCategoryChange}>
+// // //           <SelectTrigger className="w-full md:w-[180px]">
+// // //             <SelectValue placeholder="Semua Kategori" />
+// // //           </SelectTrigger>
+// // //           <SelectContent>
+// // //             <SelectItem value="all">Semua Kategori</SelectItem>
+            
+// // //             {/* 7. Gunakan data dari categoriesQuery */}
+// // //             {categoriesData?.categories?.map((category) => (
+// // //               // API Pilihan filter kategori mengharapkan string 'all' or 'categoryId'
+// // //               // jadi kita gunakan category.id
+// // //               <SelectItem key={category.id} value={String(category.id)}>
+// // //                 {category.name}
+// // //               </SelectItem>
+// // //             ))}
+// // //           </SelectContent>
+// // //         </Select>
+// // //       </div>
+
+// // //       {renderContent()}
+// // //     </div>
+// // //   );
+// // // }
+
 // // import { useQuery } from '@tanstack/react-query';
 // // import apiClient from '@/api';
 // // import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -10,6 +389,8 @@
 // // import { BookCard } from '@/components/features/BookCard';
 // // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 // // import { TriangleAlert } from 'lucide-react';
+// // import { Hero } from '@/components/features/Hero'; 
+// // import Recommendation from '@/components/features/Recommendation'; // <--- IMPORT BARU
 
 // // // Dummies, Anda bisa ganti dengan komponen loading/error yang lebih baik
 // // const LoadingSpinner = () => <div className="text-center">Loading books...</div>;
@@ -33,10 +414,9 @@
 
 // //   // === DATA FETCHING (TanStack Query) ===
 // //   const { data, isPending, isError, error } = useQuery<BooksResponse, Error>({
-// //     // Kunci query ini akan otomatis memperbarui data ketika filter/search berubah
 // //     queryKey: ['books', filterCategory, searchTerm],
 // //     queryFn: async () => {
-// //       const params: any = {};
+// //       const params: Record<string, string> = {}; 
 // //       if (filterCategory !== 'all') {
 // //         params.category = filterCategory;
 // //       }
@@ -46,7 +426,6 @@
 // //       const res = await apiClient.get('/books', { params });
 // //       return res.data;
 // //     },
-// //     // Menjaga data sebelumnya terlihat saat data baru di-fetch
 // //     placeholderData: (previousData) => previousData, 
 // //   });
 
@@ -81,10 +460,16 @@
 
 // //   return (
 // //     <div className="space-y-8">
+// //       {/* Hero section */}
+// //       <Hero />
+      
+// //       {/* Recommendation section */}
+// //       <Recommendation />
+      
 // //       <div className="flex flex-col md:flex-row gap-4">
 // //         <Input
 // //           placeholder="Cari berdasarkan judul atau penulis..."
-// //           className="flex-grow"
+// //           className="grow" 
 // //           value={searchTerm}
 // //           onChange={handleSearchChange}
 // //         />
@@ -94,7 +479,6 @@
 // //           </SelectTrigger>
 // //           <SelectContent>
 // //             <SelectItem value="all">Semua Kategori</SelectItem>
-// //             {/* Tampilkan kategori dari data API */}
 // //             {data?.categories?.map((category) => (
 // //               <SelectItem key={category} value={category}>
 // //                 {category}
@@ -109,7 +493,6 @@
 // //   );
 // // }
 
-// // src/pages/BookListPage.tsx
 
 // import { useQuery } from '@tanstack/react-query';
 // import apiClient from '@/api';
@@ -123,6 +506,9 @@
 // import { BookCard } from '@/components/features/BookCard';
 // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 // import { TriangleAlert } from 'lucide-react';
+// import { Hero } from '@/components/features/Hero'; 
+// // PERBAIKAN: Mengubah dari default import ke named import
+// import { Recommendation } from '@/components/features/Recommendation'; 
 
 // // Dummies, Anda bisa ganti dengan komponen loading/error yang lebih baik
 // const LoadingSpinner = () => <div className="text-center">Loading books...</div>;
@@ -148,7 +534,6 @@
 //   const { data, isPending, isError, error } = useQuery<BooksResponse, Error>({
 //     queryKey: ['books', filterCategory, searchTerm],
 //     queryFn: async () => {
-//       // PERBAIKAN 1: Ganti 'any' dengan 'Record<string, string>'
 //       const params: Record<string, string> = {}; 
 //       if (filterCategory !== 'all') {
 //         params.category = filterCategory;
@@ -188,15 +573,23 @@
 //         </div>
 //       );
 //     }
+
+
 //     return <p className="text-center text-muted-foreground">Tidak ada buku yang ditemukan.</p>;
 //   };
 
 //   return (
 //     <div className="space-y-8">
+//       {/* Hero section */}
+//       <Hero />
+      
+//       {/* Recommendation section */}
+//       {/* Menggunakan komponen Recommendation yang sudah di-named-export */}
+//       <Recommendation />
+      
 //       <div className="flex flex-col md:flex-row gap-4">
 //         <Input
 //           placeholder="Cari berdasarkan judul atau penulis..."
-//           // PERBAIKAN 2: Ganti 'flex-grow' dengan 'grow'
 //           className="grow" 
 //           value={searchTerm}
 //           onChange={handleSearchChange}
@@ -222,8 +615,6 @@
 // }
 
 
-// src/pages/BookListPage.tsx
-
 import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -235,17 +626,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BookCard } from '@/components/features/BookCard';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { TriangleAlert, Loader2 } from 'lucide-react'; // Loader2 diimpor
+import { TriangleAlert } from 'lucide-react';
+import { Hero } from '@/components/features/Hero'; 
+import { Recommendation } from '@/components/features/Recommendation'; 
+import { PopularAuthors } from '@/components/features/PopularAuthors'; // <--- IMPORT BARU
 
 // Dummies, Anda bisa ganti dengan komponen loading/error yang lebih baik
-const LoadingSpinner = () => (
-  <div className="text-center">
-    {/* Menggunakan Loader2 untuk konsistensi */}
-    <Loader2 className="h-8 w-8 animate-spin inline-block" />
-    <p>Loading books...</p>
-  </div>
-);
-
+const LoadingSpinner = () => <div className="text-center">Loading books...</div>;
 const ErrorDisplay = ({ message }: { message: string }) => (
   <Alert variant="destructive">
     <TriangleAlert className="h-4 w-4" />
@@ -254,64 +641,33 @@ const ErrorDisplay = ({ message }: { message: string }) => (
   </Alert>
 );
 
-// 1. Tipe data ini HANYA untuk data buku dari /api/books
-interface BooksData {
+// Asumsi API mengembalikan { books: Book[], categories: string[] }
+interface BooksResponse {
   books: Book[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
-// 2. Tipe data untuk kategori dari /api/categories
-interface Category {
-  id: number;
-  name: string;
+  categories: string[];
 }
 
 export default function BookListPage() {
   const dispatch = useAppDispatch();
   const { filterCategory, searchTerm } = useAppSelector(selectFilters);
 
-  // === 3. DATA FETCHING BUKU ===
-  const { 
-    data: booksData, 
-    isPending: isBooksPending, 
-    isError: isBooksError, 
-    error: booksError 
-  } = useQuery<BooksData, Error>({ // Tipe diubah ke BooksData
+  // === DATA FETCHING (TanStack Query) ===
+  const { data, isPending, isError, error } = useQuery<BooksResponse, Error>({
     queryKey: ['books', filterCategory, searchTerm],
     queryFn: async () => {
+      // PERBAIKAN 1: Ganti 'any' dengan 'Record<string, string>'
       const params: Record<string, string> = {}; 
       if (filterCategory !== 'all') {
-        // API mengharapkan categoryId (integer), bukan nama
-        // Untuk saat ini kita tetap kirim string, asumsi backend bisa handle
-        // Idealnya, state filterCategory menyimpan ID
         params.category = filterCategory;
       }
       if (searchTerm) {
-        // API mengharapkan 'q' untuk search, bukan 'search'
-        params.q = searchTerm; 
+        params.search = searchTerm;
       }
       const res = await apiClient.get('/books', { params });
-      // 4. Mengembalikan data yang TEPAT (res.data.data)
-      return res.data.data; 
+      return res.data;
     },
     placeholderData: (previousData) => previousData, 
   });
-
-  // === 5. DATA FETCHING KATEGORI ===
-  const { data: categoriesData } = useQuery<{ categories: Category[] }, Error>({
-    queryKey: ['categories'],
-    queryFn: async () => {
-      const res = await apiClient.get('/categories');
-      // Mengembalikan data yang TEPAT (res.data.data)
-      return res.data.data;
-    },
-  });
-
 
   // Handler untuk UI
   const handleCategoryChange = (value: string) => {
@@ -322,20 +678,18 @@ export default function BookListPage() {
     dispatch(setSearchTerm(e.target.value));
   };
 
-  // === 6. RENDER LOGIC DIPERBARUI ===
+  // === RENDER LOGIC ===
   const renderContent = () => {
-    // Tampilkan loading jika salah satu query masih pending
-    if (isBooksPending) {
+    if (isPending) {
       return <LoadingSpinner />;
     }
-    if (isBooksError) {
-      return <ErrorDisplay message={booksError.message || 'Gagal memuat buku.'} />;
+    if (isError) {
+      return <ErrorDisplay message={error.message || 'Gagal memuat buku.'} />;
     }
-    // Cek data dari booksQuery
-    if (booksData && booksData.books.length > 0) {
+    if (data && data.books.length > 0) {
       return (
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {booksData.books.map((book) => (
+          {data.books.map((book) => (
             <BookCard key={book.id} book={book} />
           ))}
         </div>
@@ -346,9 +700,19 @@ export default function BookListPage() {
 
   return (
     <div className="space-y-8">
+      {/* Hero section */}
+      <Hero />
+      
+      {/* Recommendation section */}
+      <Recommendation />
+      
+      {/* Popular Authors section */}
+      <PopularAuthors /> {/* <--- KOMPONEN BARU DITAMBAHKAN */}
+      
       <div className="flex flex-col md:flex-row gap-4">
         <Input
           placeholder="Cari berdasarkan judul atau penulis..."
+          // PERBAIKAN 2: Ganti 'flex-grow' dengan 'grow'
           className="grow" 
           value={searchTerm}
           onChange={handleSearchChange}
@@ -359,13 +723,9 @@ export default function BookListPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Semua Kategori</SelectItem>
-            
-            {/* 7. Gunakan data dari categoriesQuery */}
-            {categoriesData?.categories?.map((category) => (
-              // API Pilihan filter kategori mengharapkan string 'all' or 'categoryId'
-              // jadi kita gunakan category.id
-              <SelectItem key={category.id} value={String(category.id)}>
-                {category.name}
+            {data?.categories?.map((category) => (
+              <SelectItem key={category} value={category}>
+                {category}
               </SelectItem>
             ))}
           </SelectContent>
