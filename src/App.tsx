@@ -523,12 +523,8 @@ function App() {
             <Route path="/" element={<Navigate to="/books" replace />} />
             <Route path="/books" element={<BookListPage />} />
             <Route path="/category" element={<CategoryPage />} /> 
-            
             <Route path="/books/:id" element={<BookDetailPage />} />
-            
-            {/* RUTE BARU: Book By Author */}
             <Route path="/authors/:id" element={<BookByAuthorPage />} />
-            
             <Route path="/my-loans" element={<MyLoansPage />} />
             <Route path="/profile" element={<MyProfilePage />} />
           </Route>
