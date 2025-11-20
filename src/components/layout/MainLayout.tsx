@@ -1,8 +1,8 @@
 
 
 import { Outlet } from 'react-router-dom';
-import { Header } from './Header'; // <-- Impor Header baru
-import { Footer } from './Footer'; // <-- Impor Footer baru
+import { Header } from './Header'; 
+import { Footer } from './Footer'; 
 
 export const MainLayout = () => {
   return (

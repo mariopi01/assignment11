@@ -363,11 +363,11 @@ export default function BookDetailPage() {
             <div className="flex space-x-6 text-muted-foreground text-sm font-medium pt-2">
                 <div className="flex items-center space-x-1">
                     <FileText className="w-4 h-4" />
-                    <span>{bookDetail.pageCount} Halaman</span>
+                    <span>{bookDetail.pageCount} Page</span>
                 </div>
                 <div className="flex items-center space-x-1">
                     <Users className="w-4 h-4" />
-                    <span>{bookDetail.ratingCount} Pengguna</span>
+                    <span>{bookDetail.ratingCount} User</span>
                 </div>
                 <div className="flex items-center space-x-1">
                     <TriangleAlert className="w-4 h-4" />
@@ -378,7 +378,7 @@ export default function BookDetailPage() {
             <hr className="my-4 border-gray-200" />
             
             {/* f. text "coverImage" (Diinterpretasikan sebagai sub-judul deskripsi) */}
-            <p className="font-bold text-lg">Deskripsi Buku</p>
+            <p className="font-bold text-lg">Description</p>
             
             {/* g. Book Description */}
             <p className="text-base leading-relaxed text-gray-700">
@@ -395,7 +395,7 @@ export default function BookDetailPage() {
                     className="h-12 rounded-full font-semibold"
                     style={{ width: '200px', background: BUTTON_COLOR, padding: '8px' }}
                 >
-                    {isBorrowing ? 'Memproses...' : (bookDetail.stock > 0 ? 'Borrow Book' : 'Stok Habis')}
+                    {isBorrowing ? 'Memproses...' : (bookDetail.stock > 0 ? 'Borrow Book' : 'Out of Stock')}
                 </Button>
                 
                 {/* Add to Cart Button (Outline: #D5D7DA) */}
