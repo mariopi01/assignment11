@@ -117,9 +117,9 @@ export interface Category {
 export interface Book {
   id: string;
   title: string;
-  author: Author; // <--- PERBAIKAN: Diubah dari string ke object Author
-  category: Category; // <--- PERBAIKAN: Diubah dari string ke object Category
-  coverImageUrl: string;
+  author: Author; 
+  category: Category; 
+  coverImage: string | null;
   stock: number;
   // Menambahkan properti lain dari API untuk kelengkapan
   availableCopies: number; 

@@ -20,7 +20,7 @@ interface BookDetailApi {
     id: string; 
     title: string;
     description: string;
-    coverImageUrl: string | null;
+    coverImage: string | null;
     category: string | null; 
     author: string;
     stock: number; // Mapped from availableCopies
@@ -158,7 +158,7 @@ export default function BookDetailPage() {
           id: apiData.id.toString(), 
           title: apiData.title,
           description: apiData.description,
-          coverImageUrl: apiData.coverImage || null,
+          coverImage: apiData.coverImage || null,
           category: apiData.category?.name || null,
           author: apiData.author?.name || 'Unknown Author',
           stock: apiData.availableCopies || 0, 
@@ -321,9 +321,9 @@ export default function BookDetailPage() {
             style={{ width: '337px', height: '498px', background: '#E9EAEB' }} 
         >
             {/* Menggunakan kondisional rendering untuk placeholder lokal */}
-            {bookDetail.coverImageUrl ? (
+            {bookDetail.coverImage ? (
                 <img 
-                    src={bookDetail.coverImageUrl}
+                    src={bookDetail.coverImage}
                     alt={`Cover ${bookDetail.title}`}
                     className="max-w-full max-h-full object-contain rounded-lg"
                     style={{ width: '321px', height: '482px' }} 
