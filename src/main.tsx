@@ -51,7 +51,6 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <Provider store={store}>
       <QueryClientProvider client={queryClient}>
         <App />
-        {/* GANTI Toaster lama dengan yang baru */}
         <Toaster richColors /> 
       </QueryClientProvider>
     </Provider>

@@ -1,12 +1,10 @@
 
-
-
-// import React, { useState } from 'react'; // <-- 1. Impor useState
+// import React, { useState } from 'react'; 
 // import { Link, useNavigate } from 'react-router-dom';
 // import { Button } from '@/components/ui/button';
 // import { useAuth } from '@/hooks/useAuth';
 // import { useAppDispatch, useAppSelector } from '@/store/hooks';
-// import { selectCurrentUser, logOut } from '@/store/slices/authSlice'; // <-- 2. Impor logOut
+// import { selectCurrentUser, logOut } from '@/store/slices/authSlice'; 
 // import { selectFilters, setSearchTerm } from '@/store/slices/uiSlice';
 
 // // Impor aset gambar
@@ -25,8 +23,13 @@
 //   const navigate = useNavigate();
 //   const { searchTerm } = useAppSelector(selectFilters);
 
-//   // --- 3. Tambahkan state untuk dropdown ---
 //   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+//   // --- HANDLER BARU: Navigasi saat kotak pencarian di-klik ---
+//   const handleSearchFocus = () => {
+//     // Arahkan ke halaman kategori/list saat input menerima fokus
+//     navigate('/category'); 
+//   };
 
 //   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 //     dispatch(setSearchTerm(e.target.value));
@@ -34,11 +37,10 @@
 
 //   const handleSearchSubmit = (e: React.KeyboardEvent<HTMLInputElement>) => {
 //     if (e.key === 'Enter') {
-//       navigate('/books');
+//       navigate('/category'); 
 //     }
 //   };
 
-//   // --- 4. Buat fungsi handleLogout ---
 //   const handleLogout = () => {
 //     dispatch(logOut());
 //     navigate('/login');
@@ -46,10 +48,7 @@
 //   };
 
 //   return (
-//     <nav className="bg-white  sticky top-0 z-10 h-20">
-//       {/* Catatan: Saya menggunakan 'container mx-auto px-4' untuk layout yang lebih baik 
-//         daripada 'px-4 w-full'
-//       */}
+//     <nav className="bg-white sticky top-0 z-10 h-20">
 //       <div className="container mx-auto px-4 h-full flex justify-between items-center">
         
 //         {/* Kiri: Logo & Nama */}
@@ -70,11 +69,11 @@
 //             value={searchTerm}
 //             onChange={handleSearchChange}
 //             onKeyDown={handleSearchSubmit}
+//             onFocus={handleSearchFocus} 
 //           />
 //         </div>
 
 //         {/* Kanan: Ikon & User/Login */}
-//         {/* --- 5. Tambahkan 'relative' di sini --- */}
 //         <div className="flex items-center gap-3 relative">
 //           {/* Ikon Pencarian (Mobile) */}
 //           <Button variant="ghost" size="icon" className="md:hidden">
@@ -96,16 +95,19 @@
 //                 />
 //               </Button>
 
-//               {/* --- 6. Buat area ini bisa di-klik --- */}
+//               {/* Dropdown Toggle Area */}
 //               <div 
 //                 className="hidden md:flex items-center gap-2 cursor-pointer"
-//                 onClick={() => setIsDropdownOpen(!isDropdownOpen)} // Toggle dropdown
+//                 onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
 //               >
+//                 <Link to="/profile">
 //                 <img
 //                   src={userAvatar}
 //                   alt="User Avatar"
 //                   className="w-12 h-12 rounded-full"
 //                 />
+//                 </Link>
+
 //                 {user && (
 //                   <span className="text-lg font-semibold text-neutral-900">
 //                     {user.name}
@@ -114,12 +116,11 @@
 //                 <img
 //                   src={chevronDown}
 //                   alt=""
-//                   // --- 7. Animasi putar untuk chevron ---
 //                   className={`w-6 h-6 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
 //                 />
 //               </div>
 
-//               {/* --- 8. Tampilkan Dropdown Logout --- */}
+//               {/* Dropdown Logout */}
 //               {isDropdownOpen && (
 //                 <div className="absolute top-full right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-20">
 //                   <Button
@@ -132,7 +133,7 @@
 //                 </div>
 //               )}
 
-//               {/* Avatar Mobile (tanpa dropdown untuk kesederhanaan) */}
+//               {/* Avatar Mobile */}
 //               <div className="md:hidden">
 //                 <img
 //                   src={userAvatar}
@@ -182,6 +183,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { selectCurrentUser, logOut } from '@/store/slices/authSlice'; 
 import { selectFilters, setSearchTerm } from '@/store/slices/uiSlice';
+import { cn } from '@/lib/utils'; // Digunakan untuk styling
 
 // Impor aset gambar
 import logoBooky from '@/assets/logo_booky.png';
@@ -192,6 +194,9 @@ import chevronDown from '@/assets/chevron-down.png';
 import searchIconBlack from '@/assets/search_icon_black.png';
 import burgerIcon from '@/assets/burger_icon.png';
 
+// Konstanta Styling dari MyProfilePage.tsx
+const SHADOW_STYLE = { boxShadow: '0px 0px 20px 0px rgba(203, 202, 202, 0.25)' }; 
+
 export const Header = () => {
   const { isLoggedIn } = useAuth();
   const user = useAppSelector(selectCurrentUser);
@@ -201,9 +206,7 @@ export const Header = () => {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // --- HANDLER BARU: Navigasi saat kotak pencarian di-klik ---
   const handleSearchFocus = () => {
-    // Arahkan ke halaman kategori/list saat input menerima fokus
     navigate('/category'); 
   };
 
@@ -223,6 +226,12 @@ export const Header = () => {
     setIsDropdownOpen(false); // Tutup dropdown setelah logout
   };
 
+  // Handler navigasi profil/loans/reviews dari dropdown
+  const handleDropdownNavigation = (path: string) => {
+    setIsDropdownOpen(false);
+    navigate(path);
+  };
+  
   return (
     <nav className="bg-white sticky top-0 z-10 h-20">
       <div className="container mx-auto px-4 h-full flex justify-between items-center">
@@ -271,49 +280,91 @@ export const Header = () => {
                 />
               </Button>
 
-              {/* Dropdown Toggle Area */}
+              {/* Dropdown Toggle Area (Desktop) */}
               <div 
-                className="hidden md:flex items-center gap-2 cursor-pointer"
-                onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
+                className="hidden md:flex items-center gap-2 relative"
               >
-                <img
-                  src={userAvatar}
-                  alt="User Avatar"
-                  className="w-12 h-12 rounded-full"
-                />
-                {user && (
-                  <span className="text-lg font-semibold text-neutral-900">
-                    {user.name}
-                  </span>
-                )}
-                <img
-                  src={chevronDown}
-                  alt=""
-                  className={`w-6 h-6 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
-                />
+                {/* 1. Avatar (Clickable to /profile) */}
+                <Link to="/profile">
+                    <img
+                        src={userAvatar}
+                        alt="User Avatar"
+                        className="w-12 h-12 rounded-full cursor-pointer"
+                    />
+                </Link>
+
+                {/* 2. Name & Chevron (Toggle area) */}
+                <div
+                    className="flex items-center gap-2 cursor-pointer select-none"
+                    onClick={() => setIsDropdownOpen(!isDropdownOpen)} 
+                >
+                    {user && (
+                      <span className="text-lg font-semibold text-neutral-900">
+                        {user.name}
+                      </span>
+                    )}
+                    <img
+                      src={chevronDown}
+                      alt=""
+                      className={`w-6 h-6 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+                    />
+                </div>
               </div>
 
-              {/* Dropdown Logout */}
+              {/* Dropdown Menu (Memenuhi spesifikasi styling) */}
               {isDropdownOpen && (
-                <div className="absolute top-full right-0 mt-2 w-48 bg-white border rounded-md shadow-lg z-20">
-                  <Button
-                    variant="ghost"
-                    className="w-full justify-start p-2 text-red-600 hover:text-red-700"
-                    onClick={handleLogout}
-                  >
-                    Logout
-                  </Button>
+                <div 
+                  className="absolute top-full right-0 mt-4 bg-white border rounded-xl shadow-lg z-20 flex flex-col p-4 gap-2"
+                  // width: 184; height: 200; border-radius: 16px; padding: 16px; box-shadow: #CBCACA40;
+                  style={{ width: '184px', ...SHADOW_STYLE }} // Set width dan shadow
+                >
+                    {/* OPSI 1: Profile */}
+                    <Button
+                        variant="ghost"
+                        className={cn("w-full justify-start font-semibold rounded-lg h-10 p-2")}
+                        onClick={() => handleDropdownNavigation('/profile')}
+                    >
+                        Profile
+                    </Button>
+                    
+                    {/* OPSI 2: Borrowed List */}
+                    <Button
+                        variant="ghost"
+                        className={cn("w-full justify-start font-semibold rounded-lg h-10 p-2")}
+                        onClick={() => handleDropdownNavigation('/my-loans')}
+                    >
+                        Borrowed List
+                    </Button>
+
+                    {/* OPSI 3: Reviews (Asumsi rute /my-reviews) */}
+                    <Button
+                        variant="ghost"
+                        className={cn("w-full justify-start font-semibold rounded-lg h-10 p-2")}
+                        onClick={() => handleDropdownNavigation('/my-reviews')}
+                    >
+                        Reviews
+                    </Button>
+
+                    {/* OPSI 4: Logout */}
+                    <Button
+                        variant="ghost"
+                        className="w-full justify-start p-2 text-red-600 font-semibold hover:text-red-700 rounded-lg h-10"
+                        onClick={handleLogout}
+                    >
+                        Logout
+                    </Button>
                 </div>
               )}
 
               {/* Avatar Mobile */}
-              <div className="md:hidden">
+              {/* Avatar Mobile diarahkan langsung ke halaman profile */}
+              <Link to="/profile" className="md:hidden">
                 <img
                   src={userAvatar}
                   alt="User Avatar"
                   className="w-10 h-10 rounded-full"
                 />
-              </div>
+              </Link>
             </>
           ) : (
             // === TAMPILAN JIKA BELUM LOGIN ===
@@ -328,7 +379,7 @@ export const Header = () => {
                 </Button>
                 <Button 
                   className="w-[163px] h-12 rounded-full bg-[#1C65DA] hover:bg-[#1C65DA]/90"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate('/register')}
                 >
                   Register
                 </Button>
