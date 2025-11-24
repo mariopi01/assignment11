@@ -272,6 +272,7 @@ export const Header = () => {
           {isLoggedIn ? (
             // === TAMPILAN JIKA SUDAH LOGIN ===
             <>
+              <Link to="/cart">
               <Button variant="ghost" size="icon">
                 <img
                   src={cartIcon}
@@ -279,6 +280,7 @@ export const Header = () => {
                   className="w-6 h-[25px]"
                 />
               </Button>
+              </Link>
 
               {/* Dropdown Toggle Area (Desktop) */}
               <div 

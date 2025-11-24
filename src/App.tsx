@@ -502,6 +502,8 @@ import MyLoansPage from './pages/MyLoansPage';
 import MyProfilePage from './pages/MyProfilePage';
 import CategoryPage from '@/pages/Category';
 import BookByAuthorPage from './pages/BookByAuthor'; // <-- IMPORT BARU
+import CheckoutPage from './pages/CheckoutPage';
+import MyCartPage from './pages/MyCart';
 import { useAuth } from './hooks/useAuth';
 
 // Komponen 'GuestRoute' untuk redirect jika sudah login
@@ -525,6 +527,8 @@ function App() {
             <Route path="/category" element={<CategoryPage />} /> 
             <Route path="/books/:id" element={<BookDetailPage />} />
             <Route path="/authors/:id" element={<BookByAuthorPage />} />
+            <Route path="/cart" element={<MyCartPage />} />
+            <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/my-loans" element={<MyLoansPage />} />
             <Route path="/profile" element={<MyProfilePage />} />
           </Route>
