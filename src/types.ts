@@ -139,10 +139,10 @@ export interface Review {
 // Tipe untuk Detail Buku (termasuk review)
 export interface BookDetail extends Book {
   description: string;
-  reviews: Review[];
+  Reviews: Review[];
   // API Detail Buku mengirim author/category lengkap
-  author: Author & { bio: string };
-  category: Category;
+  Author: Author & { bio: string };
+  Category: Category;
 }
 
 // Tipe untuk Pinjaman

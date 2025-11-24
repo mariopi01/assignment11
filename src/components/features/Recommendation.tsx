@@ -12,13 +12,13 @@ import {Link} from 'react-router-dom'
 
 // --- TIPE DATA API (didasarkan pada respons Anda) ---
 interface Author { id: number; name: string; }
-interface RecommendedBook extends Omit<Book, 'author' | 'category' | 'id' | 'coverImageUrl'> {
+interface RecommendedBook extends Omit<Book, 'author' | 'category' | 'id' | 'coverImage'> {
     id: number;
     title: string;
     coverImage: string | null;
     rating: number;
-    author: Author;
-    category: {
+    Author: Author;
+    Category: {
       id: number;
       name: string;
     };
@@ -73,7 +73,7 @@ const RecommendationCard = ({ book }: { book: RecommendedBook }) => {
                 
                 <p className="font-medium text-base text-muted-foreground truncate text-left"
                    style={{ letterSpacing: '-0.03em' }}>
-                    {book.author.name}
+                    {book.Author?.name}
                 </p>
 
                 {/* PERUBAHAN DI SINI: Hanya menampilkan satu bintang dan nilai rating */}

@@ -1,12 +1,13 @@
-
-import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import apiClient from '@/api';
 import { cn } from '@/lib/utils';
-import type { Book, Review } from '@/types'; // FIX: Menambahkan import 'Book'
+import type { Book } from '@/types'; 
 import dayjs from 'dayjs'; 
+import relativeTime from 'dayjs/plugin/relativeTime';
+
+dayjs.extend(relativeTime);
 
 // Komponen & UI
 import { Button } from '@/components/ui/button';
@@ -15,46 +16,35 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { TriangleAlert, Loader2, Star, Share2, FileText, Users, BookOpen } from 'lucide-react'; 
 import { BookCard } from '@/components/features/BookCard'; 
 
-// --- TIPE DATA KHUSUS BOOK DETAIL ---
+// --- TIPE DATA KHUSUS BOOK DETAIL (Merefleksikan *hasil* mapping) ---
 interface BookDetailApi {
     id: string; 
     title: string;
     description: string;
     coverImage: string | null;
     category: string | null; 
-    author: string;
+    Author: string; // Hasil mapping dari object Author.name
     stock: number; // Mapped from availableCopies
     rating: number; 
     ratingCount: number; // Dari reviewCount API
-    reviewCount: number; // Dari reviews.length atau reviewCount API
+    reviewCount: number; // Dari Review.length atau reviewCount API
     pageCount: number; 
-    reviews: Review[]; 
+    reviews: ReviewItem[]; // Menyimpan review dari detail API sebagai fallback
 }
 
-// Tipe Data untuk API Ulasan
+// Tipe Data untuk API Ulasan (Detail Call atau Review List Call)
 interface ReviewItem {
     id: number;
     star: number;
     comment: string;
     createdAt: string;
-    user: {
+    User: { // FIX: Menggunakan 'User' (kapital) agar sesuai API response
         id: number;
         name: string;
     };
 }
 
-interface Pagination {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-}
-
-interface ReviewResponse {
-    bookId: number;
-    reviews: ReviewItem[];
-    pagination: Pagination;
-}
+// Interface yang tidak terpakai dari Pagination Review dihapus
 
 // Tipe Data untuk API Buku Terkait
 interface RelatedBooksResponse {
@@ -100,7 +90,6 @@ const FiveStarRating = ({ stars }: { stars: number }) => (
 const ReviewCard = ({ review }: { review: ReviewItem }) => {
     const BUTTON_OUTLINE = '#D5D7DA';
     
-    // Styling review card: width: 590; height: 204; border-radius: 16px; padding: 16px;
     return (
         <Card className="flex flex-col h-full text-start p-4 space-y-4 shadow-sm" 
               style={{ width: '590px', borderRadius: '16px' }}>
@@ -110,10 +99,10 @@ const ReviewCard = ({ review }: { review: ReviewItem }) => {
                 <div className="flex items-center space-x-3">
                     {/* Reviewer Image Placeholder */}
                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm">
-                        {review.user.name[0]?.toUpperCase() || 'U'}
+                        {review.User.name[0]?.toUpperCase() || 'U'}
                     </div>
                     {/* Reviewer Name */}
-                    <span className="font-bold text-base">{review.user.name}</span>
+                    <span className="font-bold text-base">{review.User.name}</span>
                 </div>
                 {/* Date */}
                 <span className="text-sm text-muted-foreground">
@@ -140,13 +129,12 @@ export default function BookDetailPage() {
   const bookId = id!;
   const queryClient = useQueryClient();
   
-  // State untuk akumulasi review
-  const [allReviews, setAllReviews] = useState<ReviewItem[]>([]);
-  // State untuk pagination review
-  const [reviewPage, setReviewPage] = useState(1);
+  // LOGIKA PAGINATION DINONAKTIFKAN UNTUK MENGHINDARI ERROR 500
+  // const [allReviews, setAllReviews] = useState<ReviewItem[]>([]);
+  // const [reviewPage, setReviewPage] = useState(1);
   const REVIEW_LIMIT = 6; 
 
-  // === FETCHING DATA BUKU DETAIL ===
+  // === FETCHING DATA BUKU DETAIL (PRIMARY SOURCE) ===
   const { data: bookDetail, isPending: isDetailPending, isError: isDetailError, error: detailError } = useQuery<BookDetailApi, Error>({
     queryKey: ['book-detail', bookId], 
     queryFn: async () => {
@@ -159,14 +147,14 @@ export default function BookDetailPage() {
           title: apiData.title,
           description: apiData.description,
           coverImage: apiData.coverImage || null,
-          category: apiData.category?.name || null,
-          author: apiData.author?.name || 'Unknown Author',
+          category: apiData.Category?.name || null, // FIX: Akses 'Category' (kapital)
+          Author: apiData.Author?.name || 'Unknown Author', // FIX: Akses 'Author' (kapital)
           stock: apiData.availableCopies || 0, 
           rating: apiData.rating || 0,
           ratingCount: apiData.reviewCount || 0,
-          reviewCount: apiData.reviews?.length || apiData.reviewCount || 0, 
+          reviewCount: apiData.Review?.length || apiData.reviewCount || 0, 
           pageCount: apiData.pageCount || 350,
-          reviews: apiData.reviews || [],
+          reviews: apiData.Review || [], // Mengambil ulasan awal dari detail API
       };
       
       return mappedData;
@@ -196,54 +184,20 @@ export default function BookDetailPage() {
     enabled: !!bookDetail && !!safeCategory && safeCategory !== 'Unknown Category',
   });
   
-  // FIX: Menambahkan optional chaining (?. ) setelah relatedData?.books
+  // Menambahkan optional chaining (?. ) setelah relatedData?.books
   const relatedBooks = relatedData?.books?.filter(b => b.id !== bookId) || [];
 
-  // === FETCHING DATA REVIEWS DENGAN PAGINATION ===
-  const { data: reviewsResponse, isFetching: isReviewsFetching, isFetched: isReviewsFetched } = useQuery<ReviewResponse, Error>({
-    queryKey: ['book-reviews', bookId, reviewPage],
-    queryFn: async () => {
-        const res = await apiClient.get(`/reviews/book/${bookId}?page=${reviewPage}&limit=${REVIEW_LIMIT}`);
-        return res.data.data;
-    },
-    enabled: !!bookId,
-  });
+  // === QUERY REVIEW PAGINATION DINONAKTIFKAN UNTUK MENGHINDARI ERROR 500 ===
   
-  // Manual accumulation logic
-  useEffect(() => {
-    if (reviewsResponse) {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
-        setAllReviews(prevReviews => {
-            const newReviews = reviewsResponse.reviews;
-            
-            // Check against the page number in the response data itself
-            if (reviewsResponse.pagination.page === 1) {
-                // If page is 1, replace with the new list
-                return newReviews;
-            }
-            
-            // For subsequent pages, append new reviews
-            // FIX: Ensure new reviews don't duplicate existing ones implicitly
-            const existingReviewIds = new Set(prevReviews.map(r => r.id));
-            const uniqueNewReviews = newReviews.filter(r => !existingReviewIds.has(r.id));
+  // REVIEW DATA SIMPLIFIED
+  // Gunakan ulasan yang dimuat dari detail API
+  const reviewsToDisplay = bookDetail?.reviews || [];
+  const reviewsLength = reviewsToDisplay.length;
 
-            return [...prevReviews, ...uniqueNewReviews];
-        });
-    }
-  }, [reviewsResponse]); 
-  
-  // Access pagination info
-  const pagination = reviewsResponse?.pagination;
-  const totalReviews = pagination?.total || 0;
-  const reviewsShown = allReviews.length; 
-  const hasMoreReviews = reviewsShown < totalReviews;
-  
-  const handleLoadMore = () => {
-      setReviewPage(prev => prev + 1);
-  };
-  
   const averageRating = bookDetail?.rating || 0;
-  const totalReviewCount = totalReviews;
+  const totalReviewCount = bookDetail?.reviewCount || 0; 
+  
+  // Nonaktifkan Load More logic
 
 
   // === MUTASI PINJAM (Borrow Book Logic) ===
@@ -282,6 +236,7 @@ export default function BookDetailPage() {
        toast.success('Pinjam Berhasil!', { description: 'Buku telah ditambahkan ke "My Loans".' });
     }
   });
+
 
   // === RENDER LOGIC ===
   if (isDetailPending) return <LoadingSpinner />;
@@ -353,7 +308,7 @@ export default function BookDetailPage() {
 
             {/* c. Book Author */}
             <p className="font-semibold text-gray-700" style={AUTHOR_STYLE}>
-                Oleh {bookDetail.author}
+                Oleh {bookDetail.Author}
             </p>
 
             {/* d. Single Star icon + Book rating */}
@@ -439,42 +394,28 @@ export default function BookDetailPage() {
         
         {/* c. Review Grid (2 kolom, 3 baris) */}
         <div className="grid grid-cols-1 gap-6 h-full md:grid-cols-2">
-            {isReviewsFetching && reviewPage === 1 && !isReviewsFetched ? (
-                // Skeleton loading untuk halaman pertama
-                Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="animate-pulse p-4 rounded-xl bg-gray-100" style={{ height: '204px' }} />
-                ))
-            ) : totalReviewCount === 0 && !isReviewsFetching && isReviewsFetched ? (
+            
+            {/* Hanya menggunakan reviews dari detail API yang stabil */}
+            {reviewsLength === 0 ? (
                 <p className="text-muted-foreground md:col-span-2">Belum ada ulasan untuk buku ini.</p>
             ) : (
                 // Menampilkan Review Card
-                allReviews.map((review) => (
+                reviewsToDisplay.map((review) => (
                     <ReviewCard key={review.id} review={review} />
                 ))
             )}
             
-            {/* Tampilkan Loading lebih banyak review di grid */}
-            {isReviewsFetching && reviewPage > 1 && (
-                <div className="md:col-span-2 text-center p-4">
-                    <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
+            {/* Logika Load More dinonaktifkan */}
+            {reviewsLength > REVIEW_LIMIT && (
+                <div className="md:col-span-2 text-center pt-4">
+                     <p className="text-muted-foreground">Hanya menampilkan ulasan awal dari detail buku.</p>
                 </div>
             )}
         </div>
         
-        {/* d. Button "Load More" */}
-        {hasMoreReviews && (
-            <div className="text-center pt-4">
-                <Button 
-                    onClick={handleLoadMore} 
-                    disabled={isReviewsFetching}
-                    variant="outline"
-                    className="h-12 rounded-full font-semibold"
-                    style={{ width: '200px', borderColor: BUTTON_OUTLINE, padding: '8px' }}
-                >
-                    {isReviewsFetching ? 'Loading...' : 'Load More'}
-                </Button>
-            </div>
-        )}
+        {/* d. Button "Load More" (Dihilangkan) */}
+        {/* Tombol tidak ditampilkan karena fungsi pagination dinonaktifkan */}
+        
       </div>
 
       {/* Related Books Section */}
