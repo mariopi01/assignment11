@@ -270,7 +270,7 @@ const TEXT_MD_BOLD = { fontSize: '1rem', lineHeight: '1.5rem', letterSpacing: '-
 const TABS = [
   { name: 'Profile', path: '/profile' },
   { name: 'Borrowed List', path: '/my-loans' },
-  { name: 'Review', path: '/profile?tab=reviews' },
+  { name: 'Review', path: '/my-reviews' },
 ];
 
 // 1. Komponen Navigation Box

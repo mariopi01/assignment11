@@ -501,7 +501,8 @@ import BookDetailPage from './pages/BookDetailPage';
 import MyLoansPage from './pages/MyLoansPage';
 import MyProfilePage from './pages/MyProfilePage';
 import CategoryPage from '@/pages/Category';
-import BookByAuthorPage from './pages/BookByAuthor'; // <-- IMPORT BARU
+import BookByAuthorPage from './pages/BookByAuthor'; 
+import MyReviewPage from './pages/MyReview';
 import CheckoutPage from './pages/CheckoutPage';
 import MyCartPage from './pages/MyCart';
 import { useAuth } from './hooks/useAuth';
@@ -530,6 +531,7 @@ function App() {
             <Route path="/cart" element={<MyCartPage />} />
             <Route path="/checkout" element={<CheckoutPage />} />
             <Route path="/my-loans" element={<MyLoansPage />} />
+            <Route path="/my-reviews" element={<MyReviewPage />} />
             <Route path="/profile" element={<MyProfilePage />} />
           </Route>
         </Route>
