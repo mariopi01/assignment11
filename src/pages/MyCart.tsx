@@ -1,302 +1,9 @@
 
-// // // src/pages/MyCart.tsx
-
-// // import { useState, useMemo } from 'react';
-// // import { useQuery, useMutation, useQueryClient, useQueries } from '@tanstack/react-query';
-// // import apiClient from '@/api';
-
-// // import { Button } from '@/components/ui/button';
-// // import { Card } from '@/components/ui/card';
-// // import { Loader2, TriangleAlert, BookOpen } from 'lucide-react';
-// // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-// // import { toast } from 'sonner';
-
-// // // --- TIPE DATA API CART ---
-// // interface CartItem {
-// //   id: number;
-// //   bookId: number;
-// //   qty: number;
-// //   book: {
-// //     id: number;
-// //     title: string;
-// //     coverImage: string | null;
-// //   };
-// // }
-
-// // interface CartResponse {
-// //   cartId: number;
-// //   items: CartItem[];
-// //   grandTotal: number;
-// // }
-
-// // // --- TIPE DATA API BOOK DETAIL ---
-// // interface BookDetailResponse {
-// //   id: number;
-// //   title: string;
-// //   coverImage: string | null;
-// //   Author: {
-// //     id: number;
-// //     name: string;
-// //   };
-// //   Category: {
-// //     id: number;
-// //     name: string;
-// //   };
-// // }
-
-// // // --- STYLING CONSTANTS ---
-// // const TITLE_STYLE = { 
-// //   fontFamily: 'Inter, sans-serif',
-// //   fontWeight: 700, 
-// //   fontSize: '3rem', 
-// //   lineHeight: '1.2', 
-// //   color: '#0A0D12' 
-// // };
-
-// // const CONTAINER_STYLE = {
-// //   maxWidth: '1000px',
-// //   width: '100%',
-// //   marginTop: '48px',
-// //   marginLeft: 'auto',
-// //   marginRight: 'auto',
-// //   gap: '32px',
-// // };
-
-// // // --- COMPONENTS ---
-// // const LoadingSpinner = () => (
-// //   <div className="flex h-[50vh] items-center justify-center">
-// //     <Loader2 className="h-8 w-8 animate-spin text-primary" />
-// //   </div>
-// // );
-
-// // const ErrorDisplay = ({ message }: { message: string }) => (
-// //   <Alert variant="destructive">
-// //     <TriangleAlert className="h-4 w-4" />
-// //     <AlertTitle>Error</AlertTitle>
-// //     <AlertDescription>{message}</AlertDescription>
-// //   </Alert>
-// // );
-
-// // export default function MyCartPage() {
-// //   const queryClient = useQueryClient();
-// //   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
-
-// //   // === 1. FETCH DATA CART ===
-// //   const { data: cartData, isPending: isCartPending, isError: isCartError, error: cartError } = useQuery<CartResponse, Error>({
-// //     queryKey: ['my-cart'],
-// //     queryFn: async () => {
-// //       const res = await apiClient.get('/cart');
-// //       return res.data.data;
-// //     },
-// //   });
-
-// //   const cartItems = cartData?.items || [];
-
-// //   // === 2. FETCH BOOK DETAILS (Author & Category) PARALEL ===
-// //   // Mengambil ID unik dari item di keranjang
-// //   const bookIds = useMemo(() => cartItems.map((item) => item.bookId), [cartItems]);
-
-// //   // Menggunakan useQueries untuk fetch detail setiap buku
-// //   const bookDetailQueries = useQueries({
-// //     queries: bookIds.map((id) => ({
-// //       queryKey: ['book-detail', id],
-// //       queryFn: async () => {
-// //         const res = await apiClient.get(`/books/${id}`);
-// //         return res.data.data as BookDetailResponse;
-// //       },
-// //       staleTime: 1000 * 60 * 5, // Cache 5 menit
-// //     })),
-// //   });
-
-// //   // Membuat Map untuk akses cepat data buku berdasarkan ID
-// //   const bookDetailsMap = useMemo(() => {
-// //     const map = new Map<number, BookDetailResponse>();
-// //     bookDetailQueries.forEach((result) => {
-// //       if (result.data) {
-// //         map.set(result.data.id, result.data);
-// //       }
-// //     });
-// //     return map;
-// //   }, [bookDetailQueries]);
-
-// //   // === 3. LOGIKA SELEKSI ===
-// //   const handleSelectAll = () => {
-// //     if (selectedItems.size === cartItems.length && cartItems.length > 0) {
-// //       setSelectedItems(new Set());
-// //     } else {
-// //       const allIds = new Set(cartItems.map(item => item.id));
-// //       setSelectedItems(allIds);
-// //     }
-// //   };
-
-// //   const handleSelectItem = (id: number) => {
-// //     const newSelected = new Set(selectedItems);
-// //     if (newSelected.has(id)) newSelected.delete(id);
-// //     else newSelected.add(id);
-// //     setSelectedItems(newSelected);
-// //   };
-
-// //   const isAllSelected = cartItems.length > 0 && selectedItems.size === cartItems.length;
-
-// //   // === 4. SUMMARY & MUTASI ===
-// //   const totalSelectedBooks = cartItems
-// //     .filter(item => selectedItems.has(item.id))
-// //     .reduce((acc, item) => acc + item.qty, 0);
-
-// //   const { mutate: borrowBooks, isPending: isBorrowing } = useMutation({
-// //     mutationFn: async () => {
-// //       if (selectedItems.size === 0) return;
-// //       const promises = Array.from(selectedItems).map(async (itemId) => {
-// //          const item = cartItems.find(i => i.id === itemId);
-// //          if (item) return apiClient.post(`/books/${item.bookId}/borrow`);
-// //       });
-// //       await Promise.all(promises);
-// //     },
-// //     onSuccess: () => {
-// //       toast.success('Peminjaman Berhasil!', { description: 'Buku terpilih telah dipinjam.' });
-// //       setSelectedItems(new Set());
-// //       queryClient.invalidateQueries({ queryKey: ['my-cart'] });
-// //       queryClient.invalidateQueries({ queryKey: ['my-loans'] });
-// //     },
-// //     onError: () => {
-// //       toast.error('Gagal Meminjam', { description: 'Stok buku mungkin habis.' });
-// //     }
-// //   });
-
-// //   // === RENDER ===
-// //   if (isCartPending) return <LoadingSpinner />;
-// //   if (isCartError) return <ErrorDisplay message={cartError?.message || 'Gagal memuat keranjang.'} />;
-
-// //   return (
-// //     <div className="flex flex-col px-4 pb-12 min-h-screen" style={CONTAINER_STYLE}>
-      
-// //       <h1 style={TITLE_STYLE} className="text-left">My Cart</h1>
-
-// //       <div className="flex flex-col lg:flex-row gap-8">
-        
-// //         {/* Kolom Kiri: List Item */}
-// //         <div className="flex-1 flex flex-col gap-4">
-          
-// //           {/* Header Checkbox */}
-// //           <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
-// //              <input 
-// //                 type="checkbox" 
-// //                 id="select-all"
-// //                 className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-// //                 checked={isAllSelected}
-// //                 onChange={handleSelectAll}
-// //              />
-// //              <label htmlFor="select-all" className="text-base font-medium cursor-pointer select-none text-[#0A0D12]">
-// //                 Select All ({cartItems.length} Items)
-// //              </label>
-// //           </div>
-
-// //           {/* Items */}
-// //           {cartItems.length === 0 ? (
-// //              <div className="text-center py-10 text-muted-foreground bg-gray-50 rounded-xl border border-dashed">
-// //                 Keranjang kosong.
-// //              </div>
-// //           ) : (
-// //              cartItems.map((item) => {
-// //                // Ambil detail buku dari hasil fetch paralel
-// //                const detail = bookDetailsMap.get(item.bookId);
-// //                const authorName = detail?.Author?.name || 'Unknown Author';
-// //                const categoryName = detail?.Category?.name || 'General';
-// //                // Gunakan cover dari API detail jika ada, fallback ke data cart
-// //                const coverImage = detail?.coverImage || item.book.coverImage;
-
-// //                return (
-// //                  <div key={item.id} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
-                    
-// //                     <div className="pt-8"> 
-// //                       <input 
-// //                           type="checkbox" 
-// //                           className="w-5 h-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500 cursor-pointer"
-// //                           checked={selectedItems.has(item.id)}
-// //                           onChange={() => handleSelectItem(item.id)}
-// //                       />
-// //                     </div>
-
-// //                     <div className="flex gap-4 grow">
-// //                         {/* Cover Image */}
-// //                         <div className="shrink-0 w-[100px] h-[140px] bg-gray-200 rounded-md overflow-hidden flex items-center justify-center">
-// //                             {coverImage ? (
-// //                                 <img src={coverImage} alt={item.book.title} className="w-full h-full object-cover" />
-// //                             ) : (
-// //                                 <BookOpen className="w-8 h-8 text-gray-400" />
-// //                             )}
-// //                         </div>
-
-// //                         {/* Details */}
-// //                         <div className="flex flex-col justify-center space-y-1 text-left">
-// //                             {/* Category Name (Fetched from API) */}
-// //                             <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide">
-// //                                 {categoryName}
-// //                             </p>
-                            
-// //                             {/* Title */}
-// //                             <h3 className="text-xl font-bold text-[#0A0D12] line-clamp-2">
-// //                                 {item.book.title}
-// //                             </h3>
-                            
-// //                             {/* Author Name (Fetched from API) */}
-// //                             <p className="text-base text-gray-600">
-// //                                 {authorName}
-// //                             </p>
-// //                         </div>
-// //                     </div>
-// //                  </div>
-// //                );
-// //              })
-// //           )}
-// //         </div>
-
-// //         {/* Kolom Kanan: Summary */}
-// //         <div className="shrink-0">
-// //             <Card 
-// //                 className="flex flex-col bg-white border border-gray-200 shadow-sm"
-// //                 style={{ 
-// //                     width: '318px', 
-// //                     height: '200px', 
-// //                     borderRadius: '16px', 
-// //                     padding: '20px', 
-// //                     gap: '24px' 
-// //                 }}
-// //             >
-// //                 <h2 className="font-bold text-xl text-[#0A0D12]">Loan Summary</h2>
-
-// //                 <div className="flex justify-between items-center">
-// //                     <span className="text-base font-medium text-gray-600">Total Book</span>
-// //                     <span className="text-xl font-bold text-[#0A0D12]">{totalSelectedBooks}</span>
-// //                 </div>
-
-// //                 <Button 
-// //                     onClick={() => borrowBooks()}
-// //                     disabled={isBorrowing || totalSelectedBooks === 0}
-// //                     className="w-full text-white font-semibold shadow-none hover:opacity-90 transition-opacity"
-// //                     style={{ 
-// //                         width: '278px', 
-// //                         height: '48px', 
-// //                         borderRadius: '100px', 
-// //                         padding: '8px',
-// //                         background: '#1C65DA',
-// //                     }}
-// //                 >
-// //                     {isBorrowing ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Borrow Book'}
-// //                 </Button>
-// //             </Card>
-// //         </div>
-
-// //       </div>
-// //     </div>
-// //   );
-// // }
-
 // // src/pages/MyCart.tsx
 
 // import { useState, useMemo } from 'react';
-// import { useQuery, useQueries } from '@tanstack/react-query';
-// import { useNavigate } from 'react-router-dom'; // 1. Import useNavigate
+// import { useQuery, useQueries } from '@tanstack/react-query'; // useMutation tidak lagi dibutuhkan di sini karena pindah ke Checkout
+// import { useNavigate } from 'react-router-dom';
 // import apiClient from '@/api';
 // import { Button } from '@/components/ui/button';
 // import { Card } from '@/components/ui/card';
@@ -313,6 +20,9 @@
 //     id: number;
 //     title: string;
 //     coverImage: string | null;
+//     // Author dan Category mungkin tidak ada di response cart awal
+//     author?: { name: string }; 
+//     category?: { name: string };
 //   };
 // }
 
@@ -322,7 +32,7 @@
 //   grandTotal: number;
 // }
 
-// // --- TIPE DATA API BOOK DETAIL ---
+// // --- TIPE DATA API BOOK DETAIL (Untuk memperkaya data Cart) ---
 // interface BookDetailResponse {
 //   id: number;
 //   title: string;
@@ -371,7 +81,7 @@
 // );
 
 // export default function MyCartPage() {
-//   const navigate = useNavigate(); // 2. Inisialisasi navigate
+//   const navigate = useNavigate();
 //   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
 //   // === 1. FETCH DATA CART ===
@@ -383,11 +93,13 @@
 //     },
 //   });
 
-//   const cartItems = useMemo(() => cartData?.items || [], [cartData?.items]);
+//   const cartItems = cartData?.items || [];
 
 //   // === 2. FETCH BOOK DETAILS (Author & Category) PARALEL ===
+//   // Mengambil ID unik dari item di keranjang untuk fetch detail
 //   const bookIds = useMemo(() => cartItems.map((item) => item.bookId), [cartItems]);
 
+//   // Menggunakan useQueries untuk fetch detail setiap buku secara paralel
 //   const bookDetailQueries = useQueries({
 //     queries: bookIds.map((id) => ({
 //       queryKey: ['book-detail', id],
@@ -395,10 +107,11 @@
 //         const res = await apiClient.get(`/books/${id}`);
 //         return res.data.data as BookDetailResponse;
 //       },
-//       staleTime: 1000 * 60 * 5, 
+//       staleTime: 1000 * 60 * 5, // Cache data buku selama 5 menit
 //     })),
 //   });
 
+//   // Membuat Map untuk akses cepat data buku berdasarkan ID buku
 //   const bookDetailsMap = useMemo(() => {
 //     const map = new Map<number, BookDetailResponse>();
 //     bookDetailQueries.forEach((result) => {
@@ -412,10 +125,10 @@
 //   // === 3. LOGIKA SELEKSI ===
 //   const handleSelectAll = () => {
 //     if (selectedItems.size === cartItems.length && cartItems.length > 0) {
-//       setSelectedItems(new Set());
+//       setSelectedItems(new Set()); // Uncheck semua
 //     } else {
 //       const allIds = new Set(cartItems.map(item => item.id));
-//       setSelectedItems(allIds);
+//       setSelectedItems(allIds); // Check semua
 //     }
 //   };
 
@@ -433,14 +146,34 @@
 //     .filter(item => selectedItems.has(item.id))
 //     .reduce((acc, item) => acc + item.qty, 0);
 
-//   // Handler untuk tombol "Borrow Book"
+//   // Handler Tombol "Borrow Book" -> Kirim Data ke CheckoutPage
 //   const handleBorrowClick = () => {
 //     if (totalSelectedBooks === 0) {
 //       toast.error("Pilih minimal satu buku untuk dipinjam.");
 //       return;
 //     }
-//     // Arahkan ke halaman checkout
-//     navigate('/checkout');
+
+//     // Mempersiapkan data untuk dikirim ke halaman checkout via state
+//     // Kita gabungkan data dari Cart (qty, cartId) dengan data Detail Buku (Author, Category)
+//     const checkoutItems = cartItems
+//       .filter(item => selectedItems.has(item.id))
+//       .map(item => {
+//         const detail = bookDetailsMap.get(item.bookId);
+//         return {
+//           ...item,
+//           book: {
+//             ...item.book,
+//             // Inject data Author & Category dari hasil query detail jika ada
+//             author: detail?.Author || { name: 'Unknown Author' },
+//             category: detail?.Category || { name: 'General' },
+//             // Gunakan cover image dari detail jika lebih update
+//             coverImage: detail?.coverImage || item.book.coverImage
+//           }
+//         };
+//       });
+
+//     // Navigasi ke halaman Checkout dengan membawa state
+//     navigate('/checkout', { state: { checkoutItems } });
 //   };
 
 //   // === RENDER ===
@@ -457,7 +190,7 @@
 //         {/* Kolom Kiri: List Item */}
 //         <div className="flex-1 flex flex-col gap-4">
           
-//           {/* Header Checkbox */}
+//           {/* Header Checkbox: Select All */}
 //           <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
 //              <input 
 //                 type="checkbox" 
@@ -471,14 +204,14 @@
 //              </label>
 //           </div>
 
-//           {/* Items */}
+//           {/* Items List */}
 //           {cartItems.length === 0 ? (
 //              <div className="text-center py-10 text-muted-foreground bg-gray-50 rounded-xl border border-dashed">
 //                 Keranjang kosong.
 //              </div>
 //           ) : (
 //              cartItems.map((item) => {
-//                // Ambil detail buku dari hasil fetch paralel
+//                // Ambil detail buku dari hasil fetch paralel (untuk tampilan Author & Category)
 //                const detail = bookDetailsMap.get(item.bookId);
 //                const authorName = detail?.Author?.name || 'Unknown Author';
 //                const categoryName = detail?.Category?.name || 'General';
@@ -487,6 +220,7 @@
 //                return (
 //                  <div key={item.id} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
                     
+//                     {/* Checkbox per item */}
 //                     <div className="pt-8"> 
 //                       <input 
 //                           type="checkbox" 
@@ -496,6 +230,7 @@
 //                       />
 //                     </div>
 
+//                     {/* Konten Buku */}
 //                     <div className="flex gap-4 grow">
 //                         {/* Cover Image */}
 //                         <div className="shrink-0 w-[100px] h-[140px] bg-gray-200 rounded-md overflow-hidden flex items-center justify-center">
@@ -506,16 +241,19 @@
 //                             )}
 //                         </div>
 
-//                         {/* Details */}
+//                         {/* Details Text */}
 //                         <div className="flex flex-col justify-center space-y-1 text-left">
+//                             {/* Category Name (dari API detail) */}
 //                             <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide">
 //                                 {categoryName}
 //                             </p>
                             
+//                             {/* Title */}
 //                             <h3 className="text-xl font-bold text-[#0A0D12] line-clamp-2">
 //                                 {item.book.title}
 //                             </h3>
                             
+//                             {/* Author Name (dari API detail) */}
 //                             <p className="text-base text-gray-600">
 //                                 {authorName}
 //                             </p>
@@ -546,8 +284,9 @@
 //                     <span className="text-xl font-bold text-[#0A0D12]">{totalSelectedBooks}</span>
 //                 </div>
 
+//                 {/* Tombol Navigasi ke Checkout */}
 //                 <Button 
-//                     onClick={handleBorrowClick} // Menggunakan handler navigasi baru
+//                     onClick={handleBorrowClick}
 //                     disabled={totalSelectedBooks === 0}
 //                     className="w-full text-white font-semibold shadow-none hover:opacity-90 transition-opacity"
 //                     style={{ 
@@ -572,12 +311,12 @@
 // src/pages/MyCart.tsx
 
 import { useState, useMemo } from 'react';
-import { useQuery, useQueries } from '@tanstack/react-query'; // useMutation tidak lagi dibutuhkan di sini karena pindah ke Checkout
+import { useQuery, useQueries, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '@/api';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Loader2, TriangleAlert, BookOpen } from 'lucide-react';
+import { Loader2, TriangleAlert, BookOpen, Trash2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from 'sonner';
 
@@ -590,7 +329,6 @@ interface CartItem {
     id: number;
     title: string;
     coverImage: string | null;
-    // Author dan Category mungkin tidak ada di response cart awal
     author?: { name: string }; 
     category?: { name: string };
   };
@@ -602,7 +340,7 @@ interface CartResponse {
   grandTotal: number;
 }
 
-// --- TIPE DATA API BOOK DETAIL (Untuk memperkaya data Cart) ---
+// --- TIPE DATA API BOOK DETAIL ---
 interface BookDetailResponse {
   id: number;
   title: string;
@@ -614,6 +352,15 @@ interface BookDetailResponse {
   Category: {
     id: number;
     name: string;
+  };
+}
+
+// Tambahkan Interface untuk Error API
+interface ApiError {
+  response?: {
+    data?: {
+      message?: string;
+    };
   };
 }
 
@@ -652,6 +399,7 @@ const ErrorDisplay = ({ message }: { message: string }) => (
 
 export default function MyCartPage() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient(); 
   const [selectedItems, setSelectedItems] = useState<Set<number>>(new Set());
 
   // === 1. FETCH DATA CART ===
@@ -663,13 +411,12 @@ export default function MyCartPage() {
     },
   });
 
-  const cartItems = cartData?.items || [];
+  // FIX: Memoize cartItems untuk menstabilkan referensi dependensi
+  const cartItems = useMemo(() => cartData?.items || [], [cartData]);
 
   // === 2. FETCH BOOK DETAILS (Author & Category) PARALEL ===
-  // Mengambil ID unik dari item di keranjang untuk fetch detail
   const bookIds = useMemo(() => cartItems.map((item) => item.bookId), [cartItems]);
 
-  // Menggunakan useQueries untuk fetch detail setiap buku secara paralel
   const bookDetailQueries = useQueries({
     queries: bookIds.map((id) => ({
       queryKey: ['book-detail', id],
@@ -677,11 +424,10 @@ export default function MyCartPage() {
         const res = await apiClient.get(`/books/${id}`);
         return res.data.data as BookDetailResponse;
       },
-      staleTime: 1000 * 60 * 5, // Cache data buku selama 5 menit
+      staleTime: 1000 * 60 * 5, 
     })),
   });
 
-  // Membuat Map untuk akses cepat data buku berdasarkan ID buku
   const bookDetailsMap = useMemo(() => {
     const map = new Map<number, BookDetailResponse>();
     bookDetailQueries.forEach((result) => {
@@ -695,10 +441,10 @@ export default function MyCartPage() {
   // === 3. LOGIKA SELEKSI ===
   const handleSelectAll = () => {
     if (selectedItems.size === cartItems.length && cartItems.length > 0) {
-      setSelectedItems(new Set()); // Uncheck semua
+      setSelectedItems(new Set()); 
     } else {
       const allIds = new Set(cartItems.map(item => item.id));
-      setSelectedItems(allIds); // Check semua
+      setSelectedItems(allIds); 
     }
   };
 
@@ -716,15 +462,12 @@ export default function MyCartPage() {
     .filter(item => selectedItems.has(item.id))
     .reduce((acc, item) => acc + item.qty, 0);
 
-  // Handler Tombol "Borrow Book" -> Kirim Data ke CheckoutPage
   const handleBorrowClick = () => {
     if (totalSelectedBooks === 0) {
       toast.error("Pilih minimal satu buku untuk dipinjam.");
       return;
     }
 
-    // Mempersiapkan data untuk dikirim ke halaman checkout via state
-    // Kita gabungkan data dari Cart (qty, cartId) dengan data Detail Buku (Author, Category)
     const checkoutItems = cartItems
       .filter(item => selectedItems.has(item.id))
       .map(item => {
@@ -733,17 +476,39 @@ export default function MyCartPage() {
           ...item,
           book: {
             ...item.book,
-            // Inject data Author & Category dari hasil query detail jika ada
             author: detail?.Author || { name: 'Unknown Author' },
             category: detail?.Category || { name: 'General' },
-            // Gunakan cover image dari detail jika lebih update
             coverImage: detail?.coverImage || item.book.coverImage
           }
         };
       });
 
-    // Navigasi ke halaman Checkout dengan membawa state
     navigate('/checkout', { state: { checkoutItems } });
+  };
+
+  // === 5. EMPTY CART MUTATION ===
+  const { mutate: emptyCart, isPending: isEmptying } = useMutation({
+    mutationFn: async () => {
+      const res = await apiClient.delete('/cart');
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success('Cart Emptied', { description: 'Semua item di keranjang telah dihapus.' });
+      setSelectedItems(new Set()); 
+      queryClient.invalidateQueries({ queryKey: ['my-cart'] }); 
+    },
+    // FIX: Menggunakan tipe ApiError alih-alih any
+    onError: (error: ApiError) => {
+      toast.error('Gagal Mengosongkan Keranjang', { 
+        description: error.response?.data?.message || 'Terjadi kesalahan saat menghapus keranjang.'
+      });
+    }
+  });
+
+  const handleEmptyCart = () => {
+    if (confirm("Apakah Anda yakin ingin mengosongkan keranjang?")) {
+      emptyCart();
+    }
   };
 
   // === RENDER ===
@@ -760,7 +525,7 @@ export default function MyCartPage() {
         {/* Kolom Kiri: List Item */}
         <div className="flex-1 flex flex-col gap-4">
           
-          {/* Header Checkbox: Select All */}
+          {/* Header Checkbox */}
           <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
              <input 
                 type="checkbox" 
@@ -781,7 +546,6 @@ export default function MyCartPage() {
              </div>
           ) : (
              cartItems.map((item) => {
-               // Ambil detail buku dari hasil fetch paralel (untuk tampilan Author & Category)
                const detail = bookDetailsMap.get(item.bookId);
                const authorName = detail?.Author?.name || 'Unknown Author';
                const categoryName = detail?.Category?.name || 'General';
@@ -789,8 +553,6 @@ export default function MyCartPage() {
 
                return (
                  <div key={item.id} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
-                    
-                    {/* Checkbox per item */}
                     <div className="pt-8"> 
                       <input 
                           type="checkbox" 
@@ -800,9 +562,7 @@ export default function MyCartPage() {
                       />
                     </div>
 
-                    {/* Konten Buku */}
                     <div className="flex gap-4 grow">
-                        {/* Cover Image */}
                         <div className="shrink-0 w-[100px] h-[140px] bg-gray-200 rounded-md overflow-hidden flex items-center justify-center">
                             {coverImage ? (
                                 <img src={coverImage} alt={item.book.title} className="w-full h-full object-cover" />
@@ -811,19 +571,13 @@ export default function MyCartPage() {
                             )}
                         </div>
 
-                        {/* Details Text */}
                         <div className="flex flex-col justify-center space-y-1 text-left">
-                            {/* Category Name (dari API detail) */}
                             <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide">
                                 {categoryName}
                             </p>
-                            
-                            {/* Title */}
                             <h3 className="text-xl font-bold text-[#0A0D12] line-clamp-2">
                                 {item.book.title}
                             </h3>
-                            
-                            {/* Author Name (dari API detail) */}
                             <p className="text-base text-gray-600">
                                 {authorName}
                             </p>
@@ -841,7 +595,7 @@ export default function MyCartPage() {
                 className="flex flex-col bg-white border border-gray-200 shadow-sm"
                 style={{ 
                     width: '318px', 
-                    height: '200px', 
+                    minHeight: '200px', 
                     borderRadius: '16px', 
                     padding: '20px', 
                     gap: '24px' 
@@ -854,21 +608,44 @@ export default function MyCartPage() {
                     <span className="text-xl font-bold text-[#0A0D12]">{totalSelectedBooks}</span>
                 </div>
 
-                {/* Tombol Navigasi ke Checkout */}
-                <Button 
-                    onClick={handleBorrowClick}
-                    disabled={totalSelectedBooks === 0}
-                    className="w-full text-white font-semibold shadow-none hover:opacity-90 transition-opacity"
-                    style={{ 
-                        width: '278px', 
-                        height: '48px', 
-                        borderRadius: '100px', 
-                        padding: '8px',
-                        background: '#1C65DA',
-                    }}
-                >
-                    Borrow Book
-                </Button>
+                <div className="flex flex-col gap-3 w-full">
+                    {/* Button Borrow Book */}
+                    <Button 
+                        onClick={handleBorrowClick}
+                        disabled={totalSelectedBooks === 0}
+                        className="w-full text-white font-semibold shadow-none hover:opacity-90 transition-opacity"
+                        style={{ 
+                            width: '100%', 
+                            height: '48px', 
+                            borderRadius: '100px', 
+                            padding: '8px',
+                            background: '#1C65DA',
+                        }}
+                    >
+                        Borrow Book
+                    </Button>
+
+                    {/* Button Empty My Cart */}
+                    <Button 
+                        onClick={handleEmptyCart}
+                        disabled={isEmptying || cartItems.length === 0}
+                        variant="outline"
+                        className="w-full font-semibold border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+                        style={{ 
+                            width: '100%', 
+                            height: '48px', 
+                            borderRadius: '100px', 
+                            padding: '8px',
+                        }}
+                    >
+                        {isEmptying ? (
+                            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        ) : (
+                            <Trash2 className="w-4 h-4 mr-2" />
+                        )}
+                        Empty My Cart
+                    </Button>
+                </div>
             </Card>
         </div>
 
