@@ -1,363 +1,3 @@
-// // // import { useLocation, Link } from 'react-router-dom';
-// // // import { useAppSelector } from '@/store/hooks';
-// // // import { selectCurrentUser } from '@/store/slices/authSlice';
-// // // import { Card } from '@/components/ui/card';
-// // // import { Button } from '@/components/ui/button';
-// // // import { Loader2 } from 'lucide-react'; // Hanya Loader2 yang dibutuhkan
-// // // import { cn } from '@/lib/utils';
-// // // import userAvatar from '@/assets/user_avatar.png'; // User Avatar Asset
-
-// // // // Konstanta Styling (Sesuai Spesifikasi Desain)
-// // // // box-shadow: 0px 0px 20px 0px #CBCACA40
-// // // const SHADOW_STYLE = { boxShadow: '0px 0px 20px 0px rgba(203, 202, 202, 0.25)' }; 
-
-// // // // 2. Text "Profile" (display-sm: 3rem / 1.2, letter-spacing: -3%)
-// // // const TITLE_STYLE = { fontSize: '3rem', lineHeight: '1.2', letterSpacing: '-0.03em' }; 
-
-// // // // text-md bold, letter-spacing: -2%
-// // // const TEXT_MD_BOLD = { fontSize: '1rem', lineHeight: '1.5rem', letterSpacing: '-0.02em' }; 
-
-// // // // Definisi Navigasi Tabs
-// // // const TABS = [
-// // //   { name: 'Profile', path: '/profile' },
-// // //   { name: 'Borrowed List', path: '/my-loans' },
-// // //   { name: 'Review', path: '/profile?tab=reviews' },
-// // // ];
-
-// // // // 1. Komponen Navigation Box
-// // // const NavigationBox = () => {
-// // //     const location = useLocation();
-    
-// // //     // Logic untuk menentukan rute aktif
-// // //     const isActive = (path: string) => {
-// // //         return location.pathname + location.search === path;
-// // //     };
-    
-// // //     return (
-// // //         <div 
-// // //             className="flex gap-2 p-2 rounded-xl shrink-0" 
-// // //             // width: 557; height: 56; gap: 8px; padding: 8px; background: #F5F5F5;
-// // //             style={{ width: '557px', height: '56px', background: '#F5F5F5', gap: '8px' }}
-// // //         >
-// // //             {TABS.map((tab) => {
-// // //                 const active = isActive(tab.path);
-                
-// // //                 return (
-// // //                     <Link
-// // //                         key={tab.name}
-// // //                         to={tab.path}
-// // //                         className="flex-1"
-// // //                     >
-// // //                         <Button
-// // //                             asChild
-// // //                             variant={active ? 'default' : 'ghost'}
-// // //                             className={cn(
-// // //                                 "w-full h-full rounded-xl text-base font-bold text-[#0A0D12]",
-// // //                                 "hover:bg-white hover:text-[#0A0D12]",
-// // //                                 // Button aktif: background: #FFFFFF; box-shadow: #CBCACA40;
-// // //                                 active && "bg-white text-[#0A0D12] hover:bg-white",
-// // //                             )}
-// // //                             style={active ? SHADOW_STYLE : {}}
-// // //                         >
-// // //                              <span>{tab.name}</span>
-// // //                         </Button>
-// // //                     </Link>
-// // //                 );
-// // //             })}
-// // //         </div>
-// // //     );
-// // // };
-
-
-// // // export default function MyProfilePage() {
-// // //   // Ambil data user dari Redux (TANPA API)
-// // //   const user = useAppSelector(selectCurrentUser); 
-  
-// // //   // Tampilkan loading screen jika data user Redux belum ada (walaupun harusnya terproteksi)
-// // //   if (!user) {
-// // //     return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
-// // //   }
-  
-// // //   // 3. Konten Container Utama Profile
-// // //   const renderProfileContent = () => (
-// // //     <Card 
-// // //         // width: 557; height: 298; padding: 20px; background: #FFFFFF; box-shadow: #CBCACA40;
-// // //         className="flex flex-col items-center justify-start p-5 gap-0"
-// // //         style={{ 
-// // //             width: '557px', 
-// // //             height: '298px', 
-// // //             borderRadius: '16px', 
-// // //             background: '#FFFFFF', 
-// // //             padding: '20px',
-// // //             ...SHADOW_STYLE 
-// // //         }}
-// // //     >
-// // //         {/* User Avatar (width: 64; height: 64;) */}
-// // //         <img
-// // //             src={userAvatar}
-// // //             alt="User Avatar"
-// // //             className="w-16 h-16 rounded-full shrink-0"
-// // //         />
-
-// // //         {/* Name (text-md bold, letter-spacing -2%) */}
-// // //         <h2 className="font-bold text-lg text-[#0A0D12] pt-4" style={TEXT_MD_BOLD}>
-// // //             {user.name}
-// // //         </h2>
-        
-// // //         {/* Email (text-md bold, letter-spacing -2%) */}
-// // //         <p className="font-bold text-lg text-muted-foreground pt-0" style={TEXT_MD_BOLD}>
-// // //             {user.email}
-// // //         </p>
-
-// // //         {/* Spacer untuk mendorong tombol ke bawah */}
-// // //         <div className="grow pt-8"></div> 
-        
-// // //         {/* Button "Update Profile" (width: 517; height: 44; background: #1C65DA) */}
-// // //         <Button 
-// // //             className="h-11 rounded-full text-white font-bold"
-// // //             style={{ width: '517px', background: '#1C65DA', padding: '8px' }}
-// // //         >
-// // //             Update Profile
-// // //         </Button>
-// // //     </Card>
-// // //   );
-
-
-// // //   return (
-// // //     <div className="flex flex-col items-center space-y-8 min-h-screen">
-      
-// // //       {/* 2. Text " Profile" */}
-// // //       <h1 className="font-extrabold text-[#0A0D12] text-center" 
-// // //           style={TITLE_STYLE}>
-// // //           Profile
-// // //       </h1>
-      
-// // //       {/* 1. Navigation Box */}
-// // //       <NavigationBox />
-
-// // //       {/* 3. Main Content Container (Profile Details) */}
-// // //       {renderProfileContent()}
-      
-// // //     </div>
-// // //   );
-// // // }
-
-
-// // import { useQuery } from '@tanstack/react-query'; // IMPORT TAMBAHAN
-// // import { useLocation, Link } from 'react-router-dom';
-// // import apiClient from '@/api'; // IMPORT TAMBAHAN
-// // import { useAppSelector } from '@/store/hooks';
-// // import { selectCurrentUser } from '@/store/slices/authSlice';
-// // import { Card } from '@/components/ui/card';
-// // import { Button } from '@/components/ui/button';
-// // import { Loader2, TriangleAlert } from 'lucide-react'; 
-// // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert'; // IMPORT TAMBAHAN
-// // import { cn } from '@/lib/utils';
-// // import userAvatar from '@/assets/user_avatar.png'; 
-
-// // // --- TIPE DATA API ---
-
-// // // Tipe untuk statistik dari API /api/me
-// // interface UserStats {
-// //   borrowed: number;
-// //   late: number;
-// //   returned: number;
-// //   total: number;
-// // }
-
-// // // Tipe untuk respons lengkap API /api/me (hanya mengambil data yang diperlukan)
-// // interface MyProfileResponse {
-// //   profile: {
-// //     id: number;
-// //     name: string;
-// //     email: string;
-// //     role: string;
-// //   };
-// //   loanStats: UserStats;
-// //   reviewsCount: number;
-// // }
-
-// // // Komponen Pembantu untuk Menampilkan Error
-// // const ErrorDisplay = ({ message }: { message: string }) => (
-// //   <Alert variant="destructive">
-// //     <TriangleAlert className="h-4 w-4" />
-// //     <AlertTitle>Error</AlertTitle>
-// //     <AlertDescription>{message}</AlertDescription>
-// //   </Alert>
-// // );
-
-// // // Konstanta Styling
-// // const SHADOW_STYLE = { boxShadow: '0px 0px 20px 0px rgba(203, 202, 202, 0.25)' }; // #CBCACA40
-// // const TITLE_STYLE = { fontSize: '3rem', lineHeight: '1.2', letterSpacing: '-0.03em' }; 
-// // const TEXT_MD_BOLD = { fontSize: '1rem', lineHeight: '1.5rem', letterSpacing: '-0.02em' }; 
-
-// // // Definisi Navigasi Tabs
-// // const TABS = [
-// //   { name: 'Profile', path: '/profile' },
-// //   { name: 'Borrowed List', path: '/my-loans' },
-// //   { name: 'Review', path: '/profile?tab=reviews' },
-// // ];
-
-// // // 1. Komponen Navigation Box
-// // const NavigationBox = () => {
-// //     const location = useLocation();
-    
-// //     const isActive = (path: string) => {
-// //         return location.pathname + location.search === path;
-// //     };
-    
-// //     return (
-// //         <div 
-// //             className="flex gap-2 p-2 rounded-xl shrink-0" 
-// //             style={{ width: '557px', height: '56px', background: '#F5F5F5', gap: '8px' }}
-// //         >
-// //             {TABS.map((tab) => {
-// //                 const active = isActive(tab.path);
-                
-// //                 return (
-// //                     <Link
-// //                         key={tab.name}
-// //                         to={tab.path}
-// //                         className="flex-1"
-// //                     >
-// //                         <Button
-// //                             asChild
-// //                             variant={active ? 'default' : 'ghost'}
-// //                             className={cn(
-// //                                 "w-full h-full rounded-xl text-base font-bold text-[#0A0D12]",
-// //                                 "hover:bg-white hover:text-[#0A0D12]",
-// //                                 active && "bg-white text-[#0A0D12] hover:bg-white",
-// //                             )}
-// //                             style={active ? SHADOW_STYLE : {}}
-// //                         >
-// //                              <span>{tab.name}</span>
-// //                         </Button>
-// //                     </Link>
-// //                 );
-// //             })}
-// //         </div>
-// //     );
-// // };
-
-
-// // export default function MyProfilePage() {
-// //   const user = useAppSelector(selectCurrentUser); 
-
-// //   // === FETCHING PROFILE & STATS DARI API ===
-// //   const { 
-// //     data: profileData, // Data lengkap: { profile, loanStats, reviewsCount }
-// //     isPending: isProfileLoading, 
-// //     isError: isProfileError,
-// //     error 
-// //   } = useQuery<MyProfileResponse, Error>({
-// //     queryKey: ['my-full-profile'],
-// //     queryFn: async () => {
-// //       const res = await apiClient.get('/me'); 
-// //       return res.data.data; // Mengambil objek data: { profile, loanStats, reviewsCount }
-// //     },
-// //     enabled: !!user, // Hanya fetch jika user sudah login (berdasarkan Redux state)
-// //   });
-
-// //   if (!user) {
-// //     return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
-// //   }
-  
-// //   // 3. Konten Container Utama Profile
-// //   const renderProfileContent = () => (
-// //     <Card 
-// //         className="flex flex-col items-center justify-start p-5 gap-0"
-// //         style={{ 
-// //             width: '557px', 
-// //             height: '298px', 
-// //             borderRadius: '16px', 
-// //             background: '#FFFFFF', 
-// //             padding: '20px',
-// //             ...SHADOW_STYLE 
-// //         }}
-// //     >
-// //         {/* User Avatar (64x64) */}
-// //         <img
-// //             src={userAvatar}
-// //             alt="User Avatar"
-// //             className="w-16 h-16 rounded-full shrink-0"
-// //         />
-
-// //         {/* Name */}
-// //         <h2 className="font-bold text-lg text-[#0A0D12] pt-4" style={TEXT_MD_BOLD}>
-// //             {user.name}
-// //         </h2>
-        
-// //         {/* Email */}
-// //         <p className="font-bold text-lg text-muted-foreground pt-0" style={TEXT_MD_BOLD}>
-// //             {user.email}
-// //         </p>
-
-// //         {/* Spacer untuk mendorong tombol ke bawah */}
-// //         <div className="grow pt-8"></div> 
-        
-// //         {/* Button "Update Profile" */}
-// //         <Button 
-// //             className="h-11 rounded-full text-white font-bold"
-// //             style={{ width: '517px', background: '#1C65DA', padding: '8px' }}
-// //         >
-// //             Update Profile
-// //         </Button>
-// //     </Card>
-// //   );
-
-
-// //   return (
-// //     <div className="flex flex-col items-center space-y-8 min-h-screen">
-      
-// //       {/* 2. Text " Profile" */}
-// //       <h1 className="font-extrabold text-[#0A0D12] text-center" 
-// //           style={TITLE_STYLE}>
-// //           Profile
-// //       </h1>
-      
-// //       {/* 1. Navigation Box */}
-// //       <NavigationBox />
-
-// //       {isProfileLoading ? (
-// //         <Loader2 className="animate-spin w-8 h-8 text-primary" />
-// //       ) : isProfileError ? (
-// //         <ErrorDisplay message={error?.message || "Gagal memuat detail dan statistik profil."} />
-// //       ) : (
-// //         // Wrapper untuk konten utama dan statistik
-// //         <div className="flex flex-col items-center space-y-6">
-            
-// //             {/* 3. Main Content Container (Profile Details) */}
-// //             {renderProfileContent()}
-            
-// //             {/* BAGIAN STATISTIK (Hanya ditampilkan jika data berhasil dimuat) */}
-// //             {profileData && (
-// //                 <Card 
-// //                   className="p-5 flex flex-col justify-start gap-4" 
-// //                   style={{ width: '557px', borderRadius: '16px', ...SHADOW_STYLE }}
-// //                 >
-// //                     <h3 className="font-bold text-xl text-[#0A0D12]">Statistics</h3>
-// //                     <div className="grid grid-cols-3 gap-4 text-center">
-// //                         <div className="p-3 bg-gray-100 rounded-lg">
-// //                             <p className="text-2xl font-bold">{profileData.loanStats.borrowed}</p>
-// //                             <p className="text-sm text-muted-foreground">Borrowed</p>
-// //                         </div>
-// //                         <div className="p-3 bg-gray-100 rounded-lg">
-// //                             <p className="text-2xl font-bold">{profileData.loanStats.returned}</p>
-// //                             <p className="text-sm text-muted-foreground">Returned</p>
-// //                         </div>
-// //                         <div className="p-3 bg-gray-100 rounded-lg">
-// //                             <p className="text-2xl font-bold">{profileData.reviewsCount}</p>
-// //                             <p className="text-sm text-muted-foreground">Reviews</p>
-// //                         </div>
-// //                     </div>
-// //                 </Card>
-// //             )}
-// //         </div>
-// //       )}
-// //     </div>
-// //   );
-// // }
-
 
 // import { useQuery } from '@tanstack/react-query';
 // import { useLocation, Link } from 'react-router-dom';
@@ -576,6 +216,10 @@
 //   );
 // }
 
+
+
+// src/pages/MyProfilePage.tsx
+
 import { useQuery } from '@tanstack/react-query';
 import { useLocation, Link } from 'react-router-dom';
 import apiClient from '@/api';
@@ -602,6 +246,7 @@ interface MyProfileResponse {
     name: string;
     email: string;
     role: string;
+    createdAt: string;
   };
   loanStats: UserStats;
   reviewsCount: number;
@@ -671,6 +316,7 @@ const NavigationBox = () => {
 
 
 export default function MyProfilePage() {
+  // User dari Redux digunakan hanya untuk pengecekan login / enabled query
   const user = useAppSelector(selectCurrentUser); 
 
   // === FETCHING PROFILE & STATS DARI API ===
@@ -689,6 +335,7 @@ export default function MyProfilePage() {
   });
 
   // 3. Konten Container Utama Profile
+  // Menggunakan 'profileData' dari API untuk Name & Email
   const renderProfileContent = () => (
     <Card 
         className="flex flex-col items-center justify-start p-5 gap-0"
@@ -708,14 +355,14 @@ export default function MyProfilePage() {
             className="w-16 h-16 rounded-full shrink-0"
         />
 
-        {/* Name */}
+        {/* Name (Dari API) */}
         <h2 className="font-bold text-lg text-[#0A0D12] pt-4" style={TEXT_MD_BOLD}>
-            {user?.name}
+            {profileData?.profile.name || user?.name}
         </h2>
         
-        {/* Email */}
+        {/* Email (Dari API) */}
         <p className="font-bold text-lg text-muted-foreground pt-0" style={TEXT_MD_BOLD}>
-            {user?.email}
+            {profileData?.profile.email || user?.email}
         </p>
 
         {/* Spacer untuk mendorong tombol ke bawah */}
@@ -731,34 +378,33 @@ export default function MyProfilePage() {
     </Card>
   );
 
-    // KELUAR DARI COMPONENT JIKA BELUM ADA USER/SEDANG LOADING AWAL
-    // Catatan: Jika `user` dari Redux null, ini akan memicu redirect karena ProtectedRoute,
-    // jadi kita hanya perlu menampilkan loader jika `!user` (state Redux belum siap)
-    if (!user) {
-        return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
-    }
-
+  // Jika user belum login/state belum siap
+  if (!user) {
+      return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
+  }
 
   return (
-    <div className="flex flex-col items-center space-y-8 min-h-screen">
+    <div className="flex flex-col items-start space-y-8 min-h-screen">
       
+      
+      
+      {/* 1. Navigation Box */}
+      <NavigationBox />
+
       {/* 2. Text " Profile" */}
       <h1 className="font-extrabold text-[#0A0D12] text-center" 
           style={TITLE_STYLE}>
           Profile
       </h1>
-      
-      {/* 1. Navigation Box */}
-      <NavigationBox />
 
       {isProfileLoading ? (
-        // Tampilkan Loader saat sedang memuat
+        // Tampilkan Loader saat sedang memuat data API
         <Loader2 className="animate-spin w-8 h-8 text-primary" />
       ) : isProfileError ? (
         // Tampilkan Error jika loading gagal
         <ErrorDisplay message={error?.message || "Gagal memuat detail dan statistik profil."} />
       ) : (
-        // Tampilkan konten jika loading selesai dan tidak ada error (Data pasti ada)
+        // Tampilkan konten jika loading selesai dan tidak ada error
         <div className="flex flex-col items-center space-y-6">
             
             {/* 3. Main Content Container (Profile Details) */}
