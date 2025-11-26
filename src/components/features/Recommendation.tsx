@@ -57,7 +57,7 @@ const RecommendationCard = ({ book }: { book: RecommendedBook }) => {
                     <img
                         src={book.coverImage}
                         alt={book.title}
-                        className="w-full h-full object-cover"
+                        className="w-56 h-[336px] object-fill"
                         style={{ borderTopLeftRadius: '12px', borderTopRightRadius: '12px' }}
                     />
                 ) : (

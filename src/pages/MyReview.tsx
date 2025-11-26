@@ -168,13 +168,14 @@ export default function MyReviewPage() {
   return (
     <div className="flex flex-col justify-center space-y-8 min-h-screen pb-12">
       
+      <NavigationBox />
       {/* 1. Text "Reviews" */}
       <h1 className="font-extrabold text-[#0A0D12] text-start" style={TITLE_STYLE}>
           Reviews
       </h1>
       
       {/* 2. Navigation Box */}
-      <NavigationBox />
+      
 
       {/* 3. Search Box */}
       <div className="relative" style={{ width: '544px', maxWidth: '100%' }}>

@@ -145,7 +145,7 @@ export default function BookByAuthorPage() {
             {mappedBooks.length > 0 ? (
                 <div className={cn(
                     "grid gap-6",
-                    "grid-cols-2 lg:grid-cols-5" 
+                    "grid-cols-2 md:grid-cols-5" 
                 )}>
                     {mappedBooks.map((book) => (
                         // Meneruskan mappedBooks yang sudah disiapkan
