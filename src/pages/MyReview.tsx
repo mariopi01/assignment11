@@ -1,5 +1,6 @@
-import { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
+
+import { useState, useEffect, useMemo } from 'react';
+import { useQuery, useQueries } from '@tanstack/react-query';
 import { useLocation, Link } from 'react-router-dom';
 import apiClient from '@/api';
 import dayjs from 'dayjs';
@@ -13,16 +14,15 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 
 // --- TIPE DATA ---
+
+// Tipe Data untuk Buku di dalam list Review (Minimal data)
 interface ReviewBook {
   id: number;
   title: string;
   coverImage: string | null;
-  // Kategori dan Penulis mungkin perlu diambil dari detail buku jika tidak tersedia langsung di review
-  // Namun, berdasarkan respon API contoh, Author dan Category tidak ada di objek Book dalam review list
-  // Kita bisa membiarkannya kosong atau fetch detail buku secara terpisah (seperti di MyLoansPage)
-  // Untuk saat ini, saya akan gunakan placeholder/fetching terpisah jika diperlukan
 }
 
+// Tipe Data Item Review
 interface ReviewItem {
   id: number;
   star: number;
@@ -33,6 +33,7 @@ interface ReviewItem {
   Book: ReviewBook;
 }
 
+// Response dari API Review List
 interface ReviewsResponse {
   reviews: ReviewItem[];
   pagination: {
@@ -40,6 +41,22 @@ interface ReviewsResponse {
     limit: number;
     total: number;
     totalPages: number;
+  };
+}
+
+// --- TIPE DATA BARU UNTUK DETAIL BUKU (Author & Category) ---
+interface BookDetailResponse {
+  id: number;
+  title: string;
+  coverImage: string | null;
+  Author: {
+    id: number;
+    name: string;
+    bio: string;
+  };
+  Category: {
+    id: number;
+    name: string;
   };
 }
 
@@ -70,11 +87,11 @@ const ErrorDisplay = ({ message }: { message: string }) => (
   </Alert>
 );
 
-// Definisi Navigasi Tabs (Sama dengan MyProfilePage)
+// Definisi Navigasi Tabs
 const TABS = [
   { name: 'Profile', path: '/profile' },
   { name: 'Borrowed List', path: '/my-loans' },
-  { name: 'Review', path: '/my-reviews' }, // Update path ke halaman ini
+  { name: 'Review', path: '/my-reviews' },
 ];
 
 const NavigationBox = () => {
@@ -83,9 +100,11 @@ const NavigationBox = () => {
     
     return (
         <div 
-            className="flex gap-2 p-2 rounded-xl shrink-0" 
-            style={{ width: '557px', height: '56px', background: '#F5F5F5', gap: '8px' }}
-        >
+          
+          className="flex gap-2 p-2 rounded-xl shrink-0 w-full md:w-[557px]" 
+          
+          style={{ height: '56px', background: '#F5F5F5' }}
+>
             {TABS.map((tab) => {
                 const active = isActive(tab.path);
                 return (
@@ -137,7 +156,7 @@ export default function MyReviewPage() {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  // === FETCH REVIEWS ===
+  // === 1. FETCH REVIEWS ===
   const { data, isPending, isError, error } = useQuery<ReviewsResponse, Error>({
     queryKey: ['my-reviews', page, debouncedSearch],
     queryFn: async () => {
@@ -146,9 +165,6 @@ export default function MyReviewPage() {
         limit: LIMIT,
       };
       
-      // Catatan: API /me/reviews mungkin belum support search param secara native berdasarkan spesifikasi CURL.
-      // Jika tidak support, filter dilakukan di client-side.
-      // Saya tetap mengirim params untuk jaga-jaga jika API diupdate.
       if (debouncedSearch) {
         params.search = debouncedSearch; 
       }
@@ -160,23 +176,52 @@ export default function MyReviewPage() {
 
   const reviews = data?.reviews || [];
 
-  // Filter Logic Client-side (Backup jika API tidak support search)
+  // Filter Logic Client-side (Backup)
   const filteredReviews = reviews.filter(review => {
       return review.Book.title.toLowerCase().includes(debouncedSearch.toLowerCase());
   });
+
+  // === 2. FETCH BOOK DETAILS (Author & Category) PARALEL ===
+  // Ambil semua unique bookId dari list review
+  const bookIds = useMemo(() => {
+    return Array.from(new Set(filteredReviews.map((r) => r.bookId)));
+  }, [filteredReviews]);
+
+  // Fetch detail untuk setiap buku secara paralel menggunakan useQueries
+  const bookDetailQueries = useQueries({
+    queries: bookIds.map((id) => ({
+      queryKey: ['book-detail', id],
+      queryFn: async () => {
+        const res = await apiClient.get(`/books/${id}`);
+        return res.data.data as BookDetailResponse;
+      },
+      staleTime: 1000 * 60 * 10, // Cache data buku selama 10 menit agar tidak request berulang
+      enabled: bookIds.length > 0,
+    })),
+  });
+
+  // Buat Map untuk akses cepat data buku berdasarkan ID
+  const bookDetailsMap = useMemo(() => {
+    const map = new Map<number, BookDetailResponse>();
+    bookDetailQueries.forEach((result) => {
+      if (result.data) {
+        map.set(result.data.id, result.data);
+      }
+    });
+    return map;
+  }, [bookDetailQueries]);
+
 
   return (
     <div className="flex flex-col justify-center space-y-8 min-h-screen pb-12">
       
       <NavigationBox />
+      
       {/* 1. Text "Reviews" */}
       <h1 className="font-extrabold text-[#0A0D12] text-start" style={TITLE_STYLE}>
           Reviews
       </h1>
       
-      {/* 2. Navigation Box */}
-      
-
       {/* 3. Search Box */}
       <div className="relative" style={{ width: '544px', maxWidth: '100%' }}>
           <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -188,7 +233,7 @@ export default function MyReviewPage() {
               className="pl-12 pr-4 h-12 rounded-full border-[#D5D7DA] bg-[#535862] bg-opacity-5 focus-visible:ring-blue-500 placeholder:text-gray-500"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ background: '#FFFFFF' }} // Menggunakan background abu muda agar sesuai tema
+              style={{ background: '#FFFFFF' }} 
           />
       </div>
 
@@ -202,67 +247,76 @@ export default function MyReviewPage() {
       ) : (
           /* 4. Review Cards List */
           <div className="flex flex-col gap-6 w-full ">
-              {filteredReviews.map((review) => (
-                  <Card 
-                    key={review.id} 
-                    className="flex flex-col p-5 gap-5 rounded-2xl border border-[#D5D7DA] bg-white shadow-sm"
-                    style={{ borderRadius: '16px', padding: '20px', gap: '20px' }}
-                  >
-                      {/* Header: Date */}
-                      <div className="text-sm text-[#535862] text-start font-medium">
-                          {dayjs(review.createdAt).format('D MMMM YYYY, HH:mm')}
-                      </div>
+              {filteredReviews.map((review) => {
+                  // Ambil detail buku dari Map
+                  const detail = bookDetailsMap.get(review.bookId);
+                  const categoryName = detail?.Category?.name || 'General';
+                  const authorName = detail?.Author?.name || 'Unknown Author';
+                  // Gunakan cover dari detail jika ada, fallback ke review list cover, lalu ke placeholder
+                  const coverImage = detail?.coverImage || review.Book.coverImage;
 
-                      {/* Divider Line */}
-                      <hr className="border-t border-[#D5D7DA]" />
+                  return (
+                    <Card 
+                        key={review.id} 
+                        className="flex flex-col p-5 gap-5 rounded-2xl border border-[#D5D7DA] bg-white shadow-sm"
+                        style={{ borderRadius: '16px', padding: '20px', gap: '20px' }}
+                    >
+                        {/* Header: Date */}
+                        <div className="text-sm text-[#535862] text-start font-medium">
+                            {dayjs(review.createdAt).format('D MMMM YYYY, HH:mm')}
+                        </div>
 
-                      {/* Book Info Section */}
-                      <div className="flex flex-row gap-6">
-                          {/* Column 1: Cover Image */}
-                          <div className="shrink-0 w-[92px] h-[138px] bg-gray-200 rounded-md overflow-hidden shadow-sm flex items-center justify-center">
-                              {review.Book.coverImage ? (
-                                  <img 
-                                      src={review.Book.coverImage} 
-                                      alt={review.Book.title} 
-                                      className="w-full h-full object-cover" 
-                                  />
-                              ) : (
-                                  <BookOpen className="w-8 h-8 text-gray-400" />
-                              )}
-                          </div>
+                        {/* Divider Line */}
+                        <hr className="border-t border-[#D5D7DA]" />
 
-                          {/* Column 2: Book Details */}
-                          <div className="flex flex-col justify-center gap-1 text-left">
-                              {/* Category (Placeholder jika API tidak menyediakan) */}
-                              <p className="text-sm font-bold text-[#0A0D12] uppercase tracking-wide">
-                                  Category {/* Placeholder, API review tidak memberikan detail kategori */}
-                              </p>
-                              
-                              {/* Book Title */}
-                              <h3 className="text-xl font-bold text-[#0A0D12] leading-tight">
-                                  {review.Book.title}
-                              </h3>
-                              
-                              {/* Author (Placeholder jika API tidak menyediakan) */}
-                              <p className="text-base font-medium text-[#414651]">
-                                  Author Name {/* Placeholder */}
-                              </p>
-                          </div>
-                      </div>
+                        {/* Book Info Section */}
+                        <div className="flex flex-row gap-6">
+                            {/* Column 1: Cover Image */}
+                            <div className="shrink-0 w-[92px] h-[138px] bg-gray-200 rounded-md overflow-hidden shadow-sm flex items-center justify-center">
+                                {coverImage ? (
+                                    <img 
+                                        src={coverImage} 
+                                        alt={review.Book.title} 
+                                        className="w-full h-full object-cover" 
+                                    />
+                                ) : (
+                                    <BookOpen className="w-8 h-8 text-gray-400" />
+                                )}
+                            </div>
 
-                      {/* Divider Line */}
-                      <hr className="border-t border-[#D5D7DA]" />
+                            {/* Column 2: Book Details */}
+                            <div className="flex flex-col justify-center gap-1 text-left">
+                                {/* Category Name */}
+                                <p className="text-sm font-bold text-[#0A0D12] uppercase tracking-wide">
+                                    {categoryName}
+                                </p>
+                                
+                                {/* Book Title */}
+                                <h3 className="text-xl font-bold text-[#0A0D12] leading-tight">
+                                    {review.Book.title}
+                                </h3>
+                                
+                                {/* Author Name */}
+                                <p className="text-base font-medium text-[#414651]">
+                                    {authorName}
+                                </p>
+                            </div>
+                        </div>
 
-                      {/* Rating & Comment */}
-                      <div className="flex flex-col gap-3 text-left">
-                          <StarRating rating={review.star} />
-                          <p className="text-base font-semibold text-[#0A0D12] leading-relaxed">
-                              {review.comment}
-                          </p>
-                      </div>
+                        {/* Divider Line */}
+                        <hr className="border-t border-[#D5D7DA]" />
 
-                  </Card>
-              ))}
+                        {/* Rating & Comment */}
+                        <div className="flex flex-col gap-3 text-left">
+                            <StarRating rating={review.star} />
+                            <p className="text-base font-semibold text-[#0A0D12] leading-relaxed">
+                                {review.comment}
+                            </p>
+                        </div>
+
+                    </Card>
+                  );
+              })}
           </div>
       )}
     </div>

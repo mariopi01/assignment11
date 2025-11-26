@@ -1,4 +1,6 @@
 
+// // src/pages/MyProfilePage.tsx
+
 // import { useQuery } from '@tanstack/react-query';
 // import { useLocation, Link } from 'react-router-dom';
 // import apiClient from '@/api';
@@ -25,6 +27,7 @@
 //     name: string;
 //     email: string;
 //     role: string;
+//     createdAt: string;
 //   };
 //   loanStats: UserStats;
 //   reviewsCount: number;
@@ -48,7 +51,7 @@
 // const TABS = [
 //   { name: 'Profile', path: '/profile' },
 //   { name: 'Borrowed List', path: '/my-loans' },
-//   { name: 'Review', path: '/profile?tab=reviews' },
+//   { name: 'Review', path: '/my-reviews' },
 // ];
 
 // // 1. Komponen Navigation Box
@@ -61,8 +64,10 @@
     
 //     return (
 //         <div 
-//             className="flex gap-2 p-2 rounded-xl shrink-0" 
-//             style={{ width: '557px', height: '56px', background: '#F5F5F5', gap: '8px' }}
+//             // UPDATE: w-full untuk mobile, md:w-[557px] untuk desktop
+//             className="flex gap-2 p-2 rounded-xl shrink-0 w-full md:w-[557px]" 
+            
+//             style={{ height: '56px', background: '#F5F5F5' }}
 //         >
 //             {TABS.map((tab) => {
 //                 const active = isActive(tab.path);
@@ -94,6 +99,7 @@
 
 
 // export default function MyProfilePage() {
+//   // User dari Redux digunakan hanya untuk pengecekan login / enabled query
 //   const user = useAppSelector(selectCurrentUser); 
 
 //   // === FETCHING PROFILE & STATS DARI API ===
@@ -114,9 +120,10 @@
 //   // 3. Konten Container Utama Profile
 //   const renderProfileContent = () => (
 //     <Card 
-//         className="flex flex-col items-center justify-start p-5 gap-0"
+//         // UPDATE: w-full untuk mobile, md:w-[557px] untuk desktop
+//         className="flex flex-col items-center justify-start p-5 gap-0 w-full md:w-[557px]"
+//         // Hapus width fixed dari style
 //         style={{ 
-//             width: '557px', 
 //             height: '298px', 
 //             borderRadius: '16px', 
 //             background: '#FFFFFF', 
@@ -131,14 +138,14 @@
 //             className="w-16 h-16 rounded-full shrink-0"
 //         />
 
-//         {/* Name */}
+//         {/* Name (Dari API) */}
 //         <h2 className="font-bold text-lg text-[#0A0D12] pt-4" style={TEXT_MD_BOLD}>
-//             {user?.name}
+//             {profileData?.profile.name || user?.name}
 //         </h2>
         
-//         {/* Email */}
+//         {/* Email (Dari API) */}
 //         <p className="font-bold text-lg text-muted-foreground pt-0" style={TEXT_MD_BOLD}>
-//             {user?.email}
+//             {profileData?.profile.email || user?.email}
 //         </p>
 
 //         {/* Spacer untuk mendorong tombol ke bawah */}
@@ -146,43 +153,43 @@
         
 //         {/* Button "Update Profile" */}
 //         <Button 
-//             className="h-11 rounded-full text-white font-bold"
-//             style={{ width: '517px', background: '#1C65DA', padding: '8px' }}
+//             // UPDATE: w-full agar mengikuti lebar parent (yang sudah ada padding)
+//             className="h-11 rounded-full text-white font-bold w-full"
+//             // Hapus width fixed dari style
+//             style={{ background: '#1C65DA', padding: '8px' }}
 //         >
 //             Update Profile
 //         </Button>
 //     </Card>
 //   );
 
-//     // KELUAR DARI COMPONENT JIKA BELUM ADA USER/SEDANG LOADING AWAL
-//     // Catatan: Jika `user` dari Redux null, ini akan memicu redirect karena ProtectedRoute,
-//     // jadi kita hanya perlu menampilkan loader jika `!user` (state Redux belum siap)
-//     if (!user) {
-//         return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
-//     }
-
+//   // Jika user belum login/state belum siap
+//   if (!user) {
+//       return <div className="flex justify-center items-center h-screen"><Loader2 className="animate-spin w-8 h-8 text-primary" /></div>;
+//   }
 
 //   return (
-//     <div className="flex flex-col items-center space-y-8 min-h-screen">
-      
-//       {/* 2. Text " Profile" */}
-//       <h1 className="font-extrabold text-[#0A0D12] text-center" 
-//           style={TITLE_STYLE}>
-//           Profile
-//       </h1>
+//     // Tambahkan padding x (px-4) agar di mobile tidak mepet layar
+//     <div className="flex flex-col items-center space-y-8 min-h-screen w-full px-4">
       
 //       {/* 1. Navigation Box */}
 //       <NavigationBox />
 
+//       {/* 2. Text "Profile" */}
+//       <h1 className="font-extrabold text-[#0A0D12] text-center" 
+//           style={TITLE_STYLE}>
+//           Profile
+//       </h1>
+
 //       {isProfileLoading ? (
-//         // Tampilkan Loader saat sedang memuat
+//         // Tampilkan Loader saat sedang memuat data API
 //         <Loader2 className="animate-spin w-8 h-8 text-primary" />
 //       ) : isProfileError ? (
 //         // Tampilkan Error jika loading gagal
 //         <ErrorDisplay message={error?.message || "Gagal memuat detail dan statistik profil."} />
 //       ) : (
-//         // Tampilkan konten jika loading selesai dan tidak ada error (Data pasti ada)
-//         <div className="flex flex-col items-center space-y-6">
+//         // Tampilkan konten jika loading selesai dan tidak ada error
+//         <div className="flex flex-col items-center space-y-6 w-full">
             
 //             {/* 3. Main Content Container (Profile Details) */}
 //             {renderProfileContent()}
@@ -190,8 +197,10 @@
 //             {/* BAGIAN STATISTIK */}
 //             {profileData && (
 //                 <Card 
-//                   className="p-5 flex flex-col justify-start gap-4" 
-//                   style={{ width: '557px', borderRadius: '16px', ...SHADOW_STYLE }}
+//                   // UPDATE: w-full untuk mobile, md:w-[557px] untuk desktop
+//                   className="p-5 flex flex-col justify-start gap-4 w-full md:w-[557px]" 
+//                   // Hapus width fixed dari style
+//                   style={{ borderRadius: '16px', ...SHADOW_STYLE }}
 //                 >
 //                     <h3 className="font-bold text-xl text-[#0A0D12]">Statistics</h3>
 //                     <div className="grid grid-cols-3 gap-4 text-center">
@@ -215,7 +224,6 @@
 //     </div>
 //   );
 // }
-
 
 
 // src/pages/MyProfilePage.tsx
@@ -263,7 +271,14 @@ const ErrorDisplay = ({ message }: { message: string }) => (
 
 // Konstanta Styling
 const SHADOW_STYLE = { boxShadow: '0px 0px 20px 0px rgba(203, 202, 202, 0.25)' }; 
-const TITLE_STYLE = { fontSize: '3rem', lineHeight: '1.2', letterSpacing: '-0.03em' }; 
+const TITLE_STYLE = { 
+  fontFamily: 'Inter, sans-serif', 
+  fontWeight: 700, 
+  fontSize: '1.875rem', // display-sm (~30px)
+  lineHeight: '2.375rem', 
+  letterSpacing: '-0.03em', 
+  color: '#0A0D12' 
+};
 const TEXT_MD_BOLD = { fontSize: '1rem', lineHeight: '1.5rem', letterSpacing: '-0.02em' }; 
 
 // Definisi Navigasi Tabs
@@ -283,8 +298,8 @@ const NavigationBox = () => {
     
     return (
         <div 
-            className="flex gap-2 p-2 rounded-xl shrink-0" 
-            style={{ width: '557px', height: '56px', background: '#F5F5F5', gap: '8px' }}
+            className="flex gap-2 p-2 rounded-xl shrink-0 w-full md:w-[557px]" 
+            style={{ height: '56px', background: '#F5F5F5' }}
         >
             {TABS.map((tab) => {
                 const active = isActive(tab.path);
@@ -335,12 +350,10 @@ export default function MyProfilePage() {
   });
 
   // 3. Konten Container Utama Profile
-  // Menggunakan 'profileData' dari API untuk Name & Email
   const renderProfileContent = () => (
     <Card 
-        className="flex flex-col items-center justify-start p-5 gap-0"
+        className="flex flex-col items-center justify-start p-5 gap-0 w-full md:w-[557px]"
         style={{ 
-            width: '557px', 
             height: '298px', 
             borderRadius: '16px', 
             background: '#FFFFFF', 
@@ -370,8 +383,8 @@ export default function MyProfilePage() {
         
         {/* Button "Update Profile" */}
         <Button 
-            className="h-11 rounded-full text-white font-bold"
-            style={{ width: '517px', background: '#1C65DA', padding: '8px' }}
+            className="h-11 rounded-full text-white font-bold w-full"
+            style={{ background: '#1C65DA', padding: '8px' }}
         >
             Update Profile
         </Button>
@@ -384,18 +397,20 @@ export default function MyProfilePage() {
   }
 
   return (
-    <div className="flex flex-col items-start space-y-8 min-h-screen">
-      
-      
+    // REVISI: items-center -> items-start (Agar semua konten rata kiri)
+    <div className="flex flex-col items-start space-y-8 min-h-screen w-full px-4">
       
       {/* 1. Navigation Box */}
       <NavigationBox />
 
-      {/* 2. Text " Profile" */}
-      <h1 className="font-extrabold text-[#0A0D12] text-center" 
+      {/* 2. Text "Profile" */}
+      {/* REVISI: text-center -> text-left */}
+      <h1 className=" text-[#0A0D12] text-left" 
           style={TITLE_STYLE}>
           Profile
       </h1>
+
+      
 
       {isProfileLoading ? (
         // Tampilkan Loader saat sedang memuat data API
@@ -405,7 +420,8 @@ export default function MyProfilePage() {
         <ErrorDisplay message={error?.message || "Gagal memuat detail dan statistik profil."} />
       ) : (
         // Tampilkan konten jika loading selesai dan tidak ada error
-        <div className="flex flex-col items-center space-y-6">
+        // REVISI: items-center -> items-start (Agar card di dalam rata kiri)
+        <div className="flex flex-col items-start space-y-6 w-full">
             
             {/* 3. Main Content Container (Profile Details) */}
             {renderProfileContent()}
@@ -413,8 +429,8 @@ export default function MyProfilePage() {
             {/* BAGIAN STATISTIK */}
             {profileData && (
                 <Card 
-                  className="p-5 flex flex-col justify-start gap-4" 
-                  style={{ width: '557px', borderRadius: '16px', ...SHADOW_STYLE }}
+                  className="p-5 flex flex-col justify-start gap-4 w-full md:w-[557px]" 
+                  style={{ borderRadius: '16px', ...SHADOW_STYLE }}
                 >
                     <h3 className="font-bold text-xl text-[#0A0D12]">Statistics</h3>
                     <div className="grid grid-cols-3 gap-4 text-center">

@@ -496,6 +496,7 @@ import ProtectedRoute from './routes/ProtectedRoute';
 
 // Halaman
 import AuthPage from './pages/AuthPage';
+import RegisterPage from './pages/RegisterPage';
 import BookListPage from './pages/BookListPage';
 import BookDetailPage from './pages/BookDetailPage';
 import MyLoansPage from './pages/MyLoansPage';
@@ -517,10 +518,12 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Rute Publik (Hanya Tamu) */}
+        {/* Rute Publik (Hanya untuk Tamu /belum login ) */}
         <Route path="/login" element={<GuestRoute />} />
+        <Route path="/register" element={<RegisterPage />} />
 
-        {/* Rute Terproteksi (Hanya User Login) */}
+
+        {/* Rute Terproteksi (Hanya User yang sudah Login) */}
         <Route element={<ProtectedRoute />}>
           <Route element={<MainLayout />}>
             <Route path="/" element={<Navigate to="/books" replace />} />

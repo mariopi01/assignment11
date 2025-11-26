@@ -290,8 +290,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100 py-12">
-      {/* Container: w-[400px], gap-20px (diterapkan via space-y-5) */}
+    <div className="flex items-center justify-center min-h-screen  py-12">
+      
       <Card className="w-[400px] bg-white shadow-lg">
         
         {/* --- 4. Header: items-start dan text-left --- */}
