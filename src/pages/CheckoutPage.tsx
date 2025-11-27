@@ -1501,24 +1501,24 @@ export default function CheckoutPage() {
           <div className="flex-1 flex flex-col gap-8">
             {/* 1. User Info (Dari API) */}
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-[#0A0D12]">User Information</h2>
-              <div className="bg-white p-6 rounded-xl border border-gray-200 shadow-sm space-y-4">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                          <p className="text-sm text-muted-foreground">Name</p>
-                          <p className="font-medium text-[#0A0D12]">
+              <h2 className="text-xl font-bold text-[#0A0D12] text-left">User Information</h2>
+              <div className=" space-y-4">
+                  <div className=" gap-4">
+                      <div className="flex justify-between items-center w-full mb-2 ">
+                          <p className="text-sm text-muted-foreground ">Name</p>
+                          <p className="font-medium text-[#0A0D12] ">
                             {userData?.profile.name || '-'}
                           </p>
                       </div>
-                      <div>
-                          <p className="text-sm text-muted-foreground">Email</p>
-                          <p className="font-medium text-[#0A0D12]">
+                      <div className="flex justify-between items-center w-full mb-2">
+                          <p className="text-sm text-muted-foreground  ">Email</p>
+                          <p className="font-medium text-[#0A0D12] ">
                             {userData?.profile.email || '-'}
                           </p>
                       </div>
-                      <div>
-                          <p className="text-sm text-muted-foreground">Nomor Handphone</p>
-                          <p className="font-medium text-[#0A0D12]">-</p>
+                      <div className="flex justify-between items-center w-full ">
+                          <p className="text-sm text-muted-foreground text-left">Nomor Handphone</p>
+                          <p className="font-medium text-[#0A0D12] text-right">-</p>
                       </div>
                   </div>
               </div>
@@ -1526,10 +1526,10 @@ export default function CheckoutPage() {
 
             {/* 2. Book List */}
             <div className="space-y-4">
-              <h2 className="text-xl font-bold text-[#0A0D12]">Book List</h2>
+              <h2 className="text-xl font-bold text-[#0A0D12] text-left">Book List</h2>
               <div className="space-y-4">
                   {itemsToCheckout.map((item) => (
-                      <div key={item.id} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+                      <div key={item.id} className="flex items-start gap-4 ">
                           <div className="shrink-0 w-20 h-[110px] bg-gray-200 rounded-md overflow-hidden flex items-center justify-center">
                               {item.book.coverImage ? (
                                   <img src={item.book.coverImage} alt={item.book.title} className="w-full h-full object-cover" />
@@ -1566,16 +1566,17 @@ export default function CheckoutPage() {
                   <h2 style={DISPLAY_SM_BOLD}>Complete Your Borrow Request</h2>
 
                   {/* Borrow Date */}
-                  <div className="space-y-1">
+                  <div className="space-y-1 text-left">
                       <p style={TEXT_SM_BOLD}>Borrow Date</p>
-                      <div className="flex items-center gap-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                          <Calendar className="w-5 h-5 text-gray-500" />
+                      <div className="flex items-center  gap-2 bg-gray-50 p-3 rounded-lg border border-gray-100">
+                          
                           <span style={TEXT_MD_SEMIBOLD}>{today.format('DD MMM YYYY')}</span>
+                          <Calendar className="w-5 h-5 text-gray-500 " />
                       </div>
                   </div>
 
                   {/* Duration */}
-                  <div className="space-y-3">
+                  <div className="space-y-3 text-left">
                       <p style={TEXT_MD_BOLD}>Borrow Duration</p>
                       <div className="flex flex-col gap-3">
                           {DURATION_OPTIONS.map((days) => (
@@ -1592,11 +1593,12 @@ export default function CheckoutPage() {
                   </div>
 
                   {/* Return Date */}
-                  <div className="space-y-1">
-                      <p style={TEXT_SM_BOLD}>Return Date</p>
+                  <div className="space-y-1 text-left">
+                      
                       <div className="p-4 bg-amber-50 border border-amber-100 rounded-lg">
-                          <p className="text-sm text-amber-900">
-                              Please return the book no later than <span className="font-bold">{returnDate ? returnDate.format('DD MMM YYYY') : '-'}</span>
+                          <p style={TEXT_SM_BOLD}>Return Date</p>
+                          <p className="text-sm">
+                              Please return the book no later than <span className=" font-semibold text-[#EE1D52]">{returnDate ? returnDate.format('DD MMM YYYY') : '-'}</span>
                           </p>
                       </div>
                   </div>
