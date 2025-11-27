@@ -1,481 +1,5 @@
 
-// import { useParams, Link } from 'react-router-dom';
-// import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-// import { toast } from 'sonner';
-// import apiClient from '@/api';
-// import { cn } from '@/lib/utils';
-// import type { Book } from '@/types'; 
-// import dayjs from 'dayjs'; 
-// import relativeTime from 'dayjs/plugin/relativeTime';
-
-// dayjs.extend(relativeTime);
-
-// // Komponen & UI
-// import { Button } from '@/components/ui/button';
-// import { Card, CardHeader, CardContent } from '@/components/ui/card';
-// import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-// import { TriangleAlert, Loader2, Star, Share2, FileText, Users, BookOpen } from 'lucide-react'; 
-// import { BookCard } from '@/components/features/BookCard'; 
-
-// // --- TIPE DATA KHUSUS BOOK DETAIL (Merefleksikan *hasil* mapping) ---
-// interface BookDetailApi {
-//     id: string; 
-//     title: string;
-//     description: string;
-//     coverImage: string | null;
-//     category: string | null; 
-//     Author: string; // Hasil mapping dari object Author.name
-//     stock: number; // Mapped from availableCopies
-//     rating: number; 
-//     ratingCount: number; // Dari reviewCount API
-//     reviewCount: number; // Dari Review.length atau reviewCount API
-//     pageCount: number; 
-//     reviews: ReviewItem[]; // Menyimpan review dari detail API sebagai fallback
-// }
-
-// // Tipe Data untuk API Ulasan (Detail Call atau Review List Call)
-// interface ReviewItem {
-//     id: number;
-//     star: number;
-//     comment: string;
-//     createdAt: string;
-//     User: { // FIX: Menggunakan 'User' (kapital) agar sesuai API response
-//         id: number;
-//         name: string;
-//     };
-// }
-
-// // Tipe untuk error API
-// interface ApiError {
-//     response?: {
-//         data?: {
-//             message?: string;
-//         };
-//     };
-// }
-
-// // --- PLACEHOLDERS ---
-// const LoadingSpinner = () => <div className="text-center p-8"><Loader2 className="h-8 w-8 animate-spin mx-auto text-primary" /></div>;
-// const ErrorDisplay = ({ message }: { message: string }) => (
-//     <Alert variant="destructive"><TriangleAlert className="h-4 w-4" /><AlertTitle>Error</AlertTitle><AlertDescription>{message}</AlertDescription></Alert>
-// );
-
-
-// // Komponen Pembantu: Single Star Rating
-// const StarRating = ({ rating }: { rating: number }) => (
-//     <div className="flex items-center space-x-1">
-//         <Star className={cn("w-5 h-5", rating > 0 ? "fill-yellow-500 text-yellow-500" : "text-gray-300")} fill={rating > 0 ? "currentColor" : "none"} />
-//         <span className="font-semibold text-lg text-foreground">
-//             {rating !== null ? rating.toFixed(1) : 'N/A'}/5
-//         </span>
-//     </div>
-// );
-
-// // Komponen Pembantu: 5 Star Rating untuk Review Card
-// const FiveStarRating = ({ stars }: { stars: number }) => (
-//     <div className="flex space-x-1">
-//         {Array.from({ length: 5 }).map((_, i) => (
-//             <Star key={i} className={cn("w-4 h-4", i < stars ? "fill-yellow-500 text-yellow-500" : "text-gray-300")} fill={i < stars ? "currentColor" : "none"} />
-//         ))}
-//     </div>
-// );
-
-// // Komponen Pembantu: Review Card
-// const ReviewCard = ({ review }: { review: ReviewItem }) => {
-//     const BUTTON_OUTLINE = '#D5D7DA';
-    
-//     return (
-//         <Card className="flex flex-col h-full text-start p-4 space-y-4 shadow-sm" 
-//               style={{ width: '590px', borderRadius: '16px' }}>
-            
-//             {/* Reviewer Info: image + name + date */}
-//             <CardHeader className="p-0 flex flex-row items-center justify-between border-b pb-3" style={{borderColor: BUTTON_OUTLINE}}>
-//                 <div className="flex items-center space-x-3">
-//                     {/* Reviewer Image Placeholder */}
-//                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm">
-//                         {review.User.name[0]?.toUpperCase() || 'U'}
-//                     </div>
-//                     {/* Reviewer Name */}
-//                     <span className="font-bold text-base">{review.User.name}</span>
-//                 </div>
-//                 {/* Date */}
-//                 <span className="text-sm text-muted-foreground">
-//                     {dayjs(review.createdAt).format('DD MMM YYYY')}
-//                 </span>
-//             </CardHeader>
-
-//             {/* 5 Star Rating */}
-//             <FiveStarRating stars={review.star} />
-
-//             {/* Review Comment */}
-//             <CardContent className="p-0 overflow-y-auto">
-//                 <p className="text-gray-700 leading-relaxed text-sm">
-//                     {review.comment}
-//                 </p>
-//             </CardContent>
-//         </Card>
-//     );
-// };
-
-// // Tipe Data untuk API Buku Terkait
-// interface RelatedBooksResponse {
-//     books: Book[];
-//     categories: string[];
-// }
-
-// // ------------------------------------------
-// // KOMPONEN UTAMA
-// // ------------------------------------------
-
-// export default function BookDetailPage() {
-//   const { id } = useParams<{ id: string }>();
-//   // Ubah ID menjadi Number untuk kebutuhan API Add To Cart/Borrow
-//   const bookId = Number(id); 
-//   const queryClient = useQueryClient();
-  
-//   // Variabel untuk pagination/review limit
-//   const REVIEW_LIMIT = 6; 
-
-//   // === FETCHING DATA BUKU DETAIL (PRIMARY SOURCE) ===
-//   const { data: bookDetail, isPending: isDetailPending, isError: isDetailError, error: detailError } = useQuery<BookDetailApi, Error>({
-//     queryKey: ['book-detail', id], 
-//     queryFn: async () => {
-//       const res = await apiClient.get(`/books/${id}`);
-//       const apiData = res.data.data;
-
-//       // Mapping Data Bersarang dan Fallback
-//       const mappedData: BookDetailApi = {
-//           id: apiData.id.toString(), 
-//           title: apiData.title,
-//           description: apiData.description,
-//           coverImage: apiData.coverImage || null,
-//           category: apiData.Category?.name || null, // FIX: Akses 'Category' (kapital)
-//           Author: apiData.Author?.name || 'Unknown Author', // FIX: Akses 'Author' (kapital)
-//           stock: apiData.availableCopies || 0, 
-//           rating: apiData.rating || 0,
-//           ratingCount: apiData.reviewCount || 0,
-//           reviewCount: apiData.Review?.length || apiData.reviewCount || 0, 
-//           pageCount: apiData.pageCount || 350,
-//           reviews: apiData.Review || [], // Mengambil ulasan awal dari detail API
-//       };
-      
-//       return mappedData;
-//     },
-//     enabled: !!id, 
-//   });
-  
-//   // Mengakses kategori dengan aman untuk query buku terkait
-//   const safeCategory = bookDetail?.category || 'Unknown Category';
-  
-//   // === FETCHING RELATED BOOKS ===
-//   const { data: relatedData, isPending: isRelatedPending, isError: isRelatedError } = useQuery<RelatedBooksResponse, Error>({
-//     queryKey: ['related-books', safeCategory],
-//     queryFn: async () => {
-//         // Jangan fetch jika kategori belum dimuat atau null
-//         if (!safeCategory || safeCategory === 'Unknown Category') return { books: [], categories: [] };
-
-//         const res = await apiClient.get('/books', { 
-//             params: { 
-//                 category: safeCategory,
-//                 limit: 10 // Fetch enough to display the grid (5 columns * 2 rows max)
-//             } 
-//         });
-//         return res.data;
-//     },
-//     // Hanya jalankan jika detail buku dimuat dan kategori aman
-//     enabled: !!bookDetail && !!safeCategory && safeCategory !== 'Unknown Category',
-//   });
-  
-//   const relatedBooks = relatedData?.books?.filter(b => Number(b.id) !== bookId) || [];
-
-//   // REVIEW DATA SIMPLIFIED
-//   const reviewsToDisplay = bookDetail?.reviews || [];
-//   const reviewsLength = reviewsToDisplay.length;
-
-//   const averageRating = bookDetail?.rating || 0;
-//   const totalReviewCount = bookDetail?.reviewCount || 0; 
-  
-//   // === MUTASI PINJAM (Borrow Book Logic) ===
-//   const { mutate: borrowBook, isPending: isBorrowing } = useMutation({
-//     mutationFn: () => apiClient.post(`/books/${bookId}/borrow`),
-    
-//     onMutate: async () => {
-//       await queryClient.cancelQueries({ queryKey: ['book-detail', id] });
-//       const previousBook = queryClient.getQueryData<BookDetailApi>(['book-detail', id]);
-
-//       if (previousBook && previousBook.stock > 0) {
-//         queryClient.setQueryData<BookDetailApi>(['book-detail', id], {
-//           ...previousBook,
-//           stock: previousBook.stock - 1, 
-//         });
-//       }
-//       toast.info('Memproses Pinjaman...', { description: 'Stok diperbarui.' });
-//       return { previousBook };
-//     },
-
-//     onError: (err: ApiError, _variables, context) => {
-//         if (context?.previousBook) {
-//           queryClient.setQueryData(['book-detail', id], context.previousBook);
-//         }
-//         toast.error('Pinjam Gagal', { 
-//             description: err.response?.data?.message || 'Stok mungkin habis atau Anda sudah meminjamnya.' 
-//         });
-//     },
-
-//     onSettled: () => {
-//        queryClient.invalidateQueries({ queryKey: ['book-detail', id] });
-//        queryClient.invalidateQueries({ queryKey: ['my-loans'] }); 
-//     },
-    
-//     onSuccess: () => {
-//        toast.success('Pinjam Berhasil!', { description: 'Buku telah ditambahkan ke "My Loans".' });
-//     }
-//   });
-
-
-//   // ------------------------------------------
-//   // ✅ MUTASI ADD TO CART (Perubahan utama di sini)
-//   // ------------------------------------------
-//   const { mutate: addToCart, isPending: isAddingToCart } = useMutation({
-//       mutationFn: () => apiClient.post(`/cart/items`, { 
-//           bookId: bookId, // Menggunakan bookId (Number)
-//           qty: 1, // Default quantity adalah 1
-//       }),
-      
-//       onMutate: () => {
-//           toast.info('Menambahkan ke keranjang...', { description: 'Memproses permintaan.' });
-//       },
-
-//       onError: (err: ApiError) => {
-//           toast.error('Gagal Menambah ke Keranjang', { 
-//               description: err.response?.data?.message || 'Terjadi kesalahan saat menambahkan buku ke keranjang.' 
-//           });
-//       },
-
-//       onSuccess: () => {
-//           // Pesan yang diminta: "Add to cart successful"
-//           toast.success('Add to cart successful', { description: 'Buku berhasil ditambahkan (atau di-merge) ke keranjang.' });
-//       },
-//   });
-
-
-//   // === RENDER LOGIC ===
-//   if (isDetailPending) return <LoadingSpinner />;
-//   if (isDetailError) return <ErrorDisplay message={detailError?.message || 'Gagal memuat detail buku.'} />;
-//   if (!bookDetail) return <p className="text-center">Buku tidak ditemukan.</p>;
-
-//   // --- STYLING CONSTANTS & SAFE ACCESS ---
-//   const TITLE_STYLE = { fontSize: '3.75rem', lineHeight: '1', letterSpacing: '-0.02em' }; 
-//   const CATEGORY_STYLE = { fontSize: '0.875rem', lineHeight: '1.25rem', letterSpacing: '-0.02em' }; 
-//   const AUTHOR_STYLE = { fontSize: '1rem', lineHeight: '1.5rem', letterSpacing: '-0.02em' }; 
-//   const BUTTON_COLOR = '#1C65DA';
-//   const BUTTON_OUTLINE = '#D5D7DA';
-//   const MAX_WIDTH_CONTAINER = 1200;
-  
-//   const categoryLink = `/books?category=${encodeURIComponent(safeCategory)}`; 
-
-//   return (
-//     <div className="space-y-10">
-        
-//       {/* Breadcrumbs */}
-//       <nav className="text-sm text-start text-muted-foreground">
-//         <Link to="/books" className="hover:underline">Home</Link>
-//         <span className="mx-2"> &gt; </span>
-//         <Link to={categoryLink} className="hover:underline">{safeCategory}</Link>
-//         <span className="mx-2"> &gt; </span>
-//         <span className="text-foreground font-medium">{bookDetail.title}</span>
-//       </nav>
-
-//       {/* Main Detail Container */}
-//       <div 
-//         className="flex flex-col lg:flex-row gap-9 justify-center mx-auto" 
-//         style={{ maxWidth: `${MAX_WIDTH_CONTAINER}px`, minHeight: '498px' }} 
-//       >
-//         {/* Kolom Kiri: Book Cover */}
-//         <div 
-//             className="shrink-0 p-2 flex items-center justify-center rounded-xl mx-auto lg:mx-0"
-//             style={{ width: '337px', height: '498px', background: '#E9EAEB' }} 
-//         >
-//             {bookDetail.coverImage ? (
-//                 <img 
-//                     src={bookDetail.coverImage}
-//                     alt={`Cover ${bookDetail.title}`}
-//                     className="max-w-full max-h-full object-contain rounded-lg"
-//                     style={{ width: '321px', height: '482px' }} 
-//                 />
-//             ) : (
-//                 <div 
-//                     className="flex items-center justify-center bg-gray-300 rounded-lg"
-//                     style={{ width: '321px', height: '482px' }} 
-//                 >
-//                     <BookOpen className="w-24 h-24 text-gray-500" />
-//                 </div>
-//             )}
-//         </div>
-
-//         {/* Kolom Kanan: Details - Ditambahkan text-left untuk memastikan rapat kiri */}
-//         <div className="grow max-w-full lg:max-w-[760px] space-y-4 text-left">
-            
-//             {/* a. Book Category Name */}
-//             <p className="font-bold text-[#0A0D12]" style={CATEGORY_STYLE}>
-//                 {safeCategory.toUpperCase()}
-//             </p>
-            
-//             {/* b. Book Title */}
-//             <h1 className="font-bold text-[#0A0D12]" style={TITLE_STYLE}>
-//                 {bookDetail.title}
-//             </h1>
-
-//             {/* c. Book Author */}
-//             <p className="font-semibold text-gray-700" style={AUTHOR_STYLE}>
-//                 Oleh {bookDetail.Author}
-//             </p>
-
-//             {/* d. Single Star icon + Book rating */}
-//             <StarRating rating={bookDetail.rating} />
-
-//             {/* e. Number of page | Rating count | reviewCount */}
-//             <div className="flex space-x-6 text-muted-foreground text-sm font-medium pt-2">
-//                 <div className="flex items-center space-x-1">
-//                     <FileText className="w-4 h-4" />
-//                     <span>{bookDetail.pageCount} Page</span>
-//                 </div>
-//                 <div className="flex items-center space-x-1">
-//                     <Users className="w-4 h-4" />
-//                     <span>{bookDetail.ratingCount} User</span>
-//                 </div>
-//                 <div className="flex items-center space-x-1">
-//                     <TriangleAlert className="w-4 h-4" />
-//                     <span>{bookDetail.reviewCount} Review</span>
-//                 </div>
-//             </div>
-
-//             <hr className="my-4 border-gray-200" />
-            
-//             {/* f. text "Description" */}
-//             <p className="font-bold text-lg">Description</p>
-            
-//             {/* g. Book Description */}
-//             <p className="text-base leading-relaxed text-gray-700">
-//                 {bookDetail.description}
-//             </p>
-
-//             {/* h. Action Buttons (Perubahan di sini) */}
-//             <div className="flex items-center space-x-4 pt-6">
-                
-//                 {/* Borrow Book Button (Primary: #1C65DA) */}
-//                 <Button 
-//                     onClick={() => borrowBook()}
-//                     disabled={isBorrowing || isAddingToCart || bookDetail.stock <= 0}
-//                     className="h-12 rounded-full font-semibold"
-//                     style={{ width: '200px', background: BUTTON_COLOR, padding: '8px' }}
-//                 >
-//                     {isBorrowing ? 'Memproses...' : (bookDetail.stock > 0 ? 'Borrow Book' : 'Out of Stock')}
-//                 </Button>
-                
-//                 {/* Add to Cart Button (Outline: #D5D7DA) */}
-//                 <Button 
-//                     onClick={() => addToCart()} // ✅ Menggunakan mutasi addToCart
-//                     variant="outline"
-//                     className="h-12 rounded-full font-semibold"
-//                     style={{ width: '200px', borderColor: BUTTON_OUTLINE, padding: '8px' }}
-//                     disabled={isAddingToCart || isBorrowing || bookDetail.stock <= 0} // ✅ Disable saat mutasi Add/Borrow
-//                 >
-//                     {isAddingToCart ? 'Adding...' : 'Add to Cart'} {/* ✅ Teks Loading */}
-//                 </Button>
-                
-//                 {/* Share Icon Button */}
-//                 <Button 
-//                     variant="outline"
-//                     className="rounded-full flex items-center justify-center p-0"
-//                     style={{ width: '44px', height: '44px', borderColor: BUTTON_OUTLINE, padding: '12px 16px' }} 
-//                 >
-//                     <Share2 className="w-5 h-5" />
-//                 </Button>
-                
-                
-//             </div>
-//         </div>
-//       </div>
-      
-//       {/* Review Section */}
-//       <div className="space-y-6 pt-10">
-        
-//         {/* 1. Garis pembatas horizontal */}
-//         <hr className="border border-gray-300" style={{ borderColor: BUTTON_OUTLINE }} />
-        
-//         {/* a. Text: Review + b. Single star + rating + (jumlah review) */}
-//         <div className="flex text-start items-center h-full gap-4">
-//             <h2 className="text-3xl font-bold">Review</h2>
-//             <StarRating rating={averageRating} />
-//             <span className="text-xl text-muted-foreground">
-//                 ({totalReviewCount} Reviews)
-//             </span>
-//         </div>
-        
-//         {/* c. Review Grid (2 kolom, 3 baris) */}
-//         <div className="grid grid-cols-1 gap-6 h-full md:grid-cols-2">
-            
-//             {reviewsLength === 0 ? (
-//                 <p className="text-muted-foreground md:col-span-2">Belum ada ulasan untuk buku ini.</p>
-//             ) : (
-//                 reviewsToDisplay.map((review) => (
-//                     <ReviewCard key={review.id} review={review} />
-//                 ))
-//             )}
-            
-//             {reviewsLength > REVIEW_LIMIT && (
-//                 <div className="md:col-span-2 text-center pt-4">
-//                     <p className="text-muted-foreground">Hanya menampilkan ulasan awal dari detail buku.</p>
-//                 </div>
-//             )}
-//         </div>
-        
-//       </div>
-
-//       {/* Related Books Section */}
-//       <div className="space-y-6 pt-10">
-        
-//         {/* 1. Text: "Related Books" */}
-//         <h2 className="font-bold text-[#0A0D12] text-left" 
-//             style={{ fontSize: '2rem', lineHeight: '1.2' }}>
-//             Related Books
-//         </h2>
-
-//         {isRelatedPending && (
-//             <div className="text-center p-4">
-//                 <Loader2 className="h-6 w-6 animate-spin mx-auto text-primary" />
-//                 <p>Memuat buku terkait...</p>
-//             </div>
-//         )}
-
-//         {isRelatedError && (
-//             <ErrorDisplay message={`Gagal memuat buku terkait.`} />
-//         )}
-
-//         {/* 2. Grid berisi Book card */}
-//         {(!isRelatedPending && relatedBooks.length > 0) && (
-//             <div className={cn(
-//                 "grid gap-6",
-//                 "grid-cols-2 md:grid-cols-3 lg:grid-cols-5" 
-//             )}>
-//                 {relatedBooks.map((book) => (
-//                     <BookCard key={book.id} book={book} />
-//                 ))}
-//             </div>
-//         )}
-
-//         {(!isRelatedPending && relatedBooks.length === 0) && (
-//             <p className="text-muted-foreground">Tidak ada buku terkait dalam kategori ini.</p>
-//         )}
-//       </div>
-
-//     </div>
-//   );
-// }
-
-
-import { useParams, Link, useNavigate } from 'react-router-dom'; // Tambahkan useNavigate
+import { useParams, Link, useNavigate } from 'react-router-dom'; 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import apiClient from '@/api';
@@ -493,29 +17,30 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { TriangleAlert, Loader2, Star, Share2, FileText, Users, BookOpen } from 'lucide-react'; 
 import { BookCard } from '@/components/features/BookCard'; 
 
-// --- TIPE DATA KHUSUS BOOK DETAIL (Merefleksikan *hasil* mapping) ---
+// --- TIPE DATA KHUSUS BOOK DETAIL ---
 interface BookDetailApi {
     id: string; 
     title: string;
     description: string;
     coverImage: string | null;
     category: string | null; 
-    Author: string; // Hasil mapping dari object Author.name
-    stock: number; // Mapped from availableCopies
+    categoryId: number; // TAMBAHAN: Menyimpan ID Kategori untuk Related Books
+    Author: string; 
+    stock: number; 
     rating: number; 
-    ratingCount: number; // Dari reviewCount API
-    reviewCount: number; // Dari Review.length atau reviewCount API
+    ratingCount: number; 
+    reviewCount: number; 
     pageCount: number; 
-    reviews: ReviewItem[]; // Menyimpan review dari detail API sebagai fallback
+    reviews: ReviewItem[]; 
 }
 
-// Tipe Data untuk API Ulasan (Detail Call atau Review List Call)
+// Tipe Data untuk API Ulasan
 interface ReviewItem {
     id: number;
     star: number;
     comment: string;
     createdAt: string;
-    User: { // FIX: Menggunakan 'User' (kapital) agar sesuai API response
+    User: { 
         id: number;
         name: string;
     };
@@ -535,7 +60,6 @@ const LoadingSpinner = () => <div className="text-center p-8"><Loader2 className
 const ErrorDisplay = ({ message }: { message: string }) => (
     <Alert variant="destructive"><TriangleAlert className="h-4 w-4" /><AlertTitle>Error</AlertTitle><AlertDescription>{message}</AlertDescription></Alert>
 );
-
 
 // Komponen Pembantu: Single Star Rating
 const StarRating = ({ rating }: { rating: number }) => (
@@ -564,26 +88,20 @@ const ReviewCard = ({ review }: { review: ReviewItem }) => {
         <Card className="flex flex-col h-full text-start p-4 space-y-4 shadow-sm" 
               style={{ width: '590px', borderRadius: '16px' }}>
             
-            {/* Reviewer Info: image + name + date */}
             <CardHeader className="p-0 flex flex-row items-center justify-between border-b pb-3" style={{borderColor: BUTTON_OUTLINE}}>
                 <div className="flex items-center space-x-3">
-                    {/* Reviewer Image Placeholder */}
                     <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm">
                         {review.User.name[0]?.toUpperCase() || 'U'}
                     </div>
-                    {/* Reviewer Name */}
                     <span className="font-bold text-base">{review.User.name}</span>
                 </div>
-                {/* Date */}
                 <span className="text-sm text-muted-foreground">
                     {dayjs(review.createdAt).format('DD MMM YYYY')}
                 </span>
             </CardHeader>
 
-            {/* 5 Star Rating */}
             <FiveStarRating stars={review.star} />
 
-            {/* Review Comment */}
             <CardContent className="p-0 overflow-y-auto">
                 <p className="text-gray-700 leading-relaxed text-sm">
                     {review.comment}
@@ -593,48 +111,40 @@ const ReviewCard = ({ review }: { review: ReviewItem }) => {
     );
 };
 
-// Tipe Data untuk API Buku Terkait
-interface RelatedBooksResponse {
-    books: Book[];
-    categories: string[];
-}
-
 // ------------------------------------------
 // KOMPONEN UTAMA
 // ------------------------------------------
 
 export default function BookDetailPage() {
   const { id } = useParams<{ id: string }>();
-  const navigate = useNavigate(); // Hook untuk navigasi
+  const navigate = useNavigate(); 
   
-  // Ubah ID menjadi Number untuk kebutuhan API Add To Cart/Borrow
   const bookId = Number(id); 
   const queryClient = useQueryClient();
   
-  // Variabel untuk pagination/review limit
   const REVIEW_LIMIT = 6; 
 
-  // === FETCHING DATA BUKU DETAIL (PRIMARY SOURCE) ===
+  // === FETCHING DATA BUKU DETAIL ===
   const { data: bookDetail, isPending: isDetailPending, isError: isDetailError, error: detailError } = useQuery<BookDetailApi, Error>({
     queryKey: ['book-detail', id], 
     queryFn: async () => {
       const res = await apiClient.get(`/books/${id}`);
       const apiData = res.data.data;
 
-      // Mapping Data Bersarang dan Fallback
       const mappedData: BookDetailApi = {
           id: apiData.id.toString(), 
           title: apiData.title,
           description: apiData.description,
           coverImage: apiData.coverImage || null,
-          category: apiData.Category?.name || null, // FIX: Akses 'Category' (kapital)
-          Author: apiData.Author?.name || 'Unknown Author', // FIX: Akses 'Author' (kapital)
+          category: apiData.Category?.name || null, 
+          categoryId: apiData.categoryId || 0, // Simpan Category ID
+          Author: apiData.Author?.name || 'Unknown Author', 
           stock: apiData.availableCopies || 0, 
           rating: apiData.rating || 0,
           ratingCount: apiData.reviewCount || 0,
           reviewCount: apiData.Review?.length || apiData.reviewCount || 0, 
           pageCount: apiData.pageCount || 350,
-          reviews: apiData.Review || [], // Mengambil ulasan awal dari detail API
+          reviews: apiData.Review || [], 
       };
       
       return mappedData;
@@ -642,44 +152,60 @@ export default function BookDetailPage() {
     enabled: !!id, 
   });
   
-  // Mengakses kategori dengan aman untuk query buku terkait
-  const safeCategory = bookDetail?.category || 'Unknown Category';
+  // Ambil categoryId dari detail buku
+  const categoryId = bookDetail?.categoryId;
+  const categoryName = bookDetail?.category || 'Unknown Category';
   
-  // === FETCHING RELATED BOOKS ===
-  const { data: relatedData, isPending: isRelatedPending, isError: isRelatedError } = useQuery<RelatedBooksResponse, Error>({
-    queryKey: ['related-books', safeCategory],
+  // === FETCHING RELATED BOOKS (BY CATEGORY ID) ===
+  const { data: relatedBooksData, isPending: isRelatedPending, isError: isRelatedError } = useQuery<Book[], Error>({
+    queryKey: ['related-books', categoryId],
     queryFn: async () => {
-        // Jangan fetch jika kategori belum dimuat atau null
-        if (!safeCategory || safeCategory === 'Unknown Category') return { books: [], categories: [] };
+        // Jangan fetch jika categoryId tidak valid
+        if (!categoryId) return [];
 
         const res = await apiClient.get('/books', { 
             params: { 
-                category: safeCategory,
-                limit: 10 // Fetch enough to display the grid (5 columns * 2 rows max)
+                categoryId: categoryId, // Filter by Category ID
+                limit: 10 
             } 
         });
-        return res.data;
+        
+        const apiBooks = res.data.data.books;
+
+        // Mapping data API (Author, Category Capital) ke format UI (author, category lowercase)
+        // agar kompatibel dengan komponen BookCard
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const mappedRelatedBooks: Book[] = apiBooks.map((b: any) => ({
+            id: b.id.toString(),
+            title: b.title,
+            author: b.Author,    // API return Author object
+            category: b.Category,// API return Category object
+            coverImage: b.coverImage,
+            stock: b.stock,
+            availableCopies: b.availableCopies,
+            rating: b.rating
+        }));
+
+        return mappedRelatedBooks;
     },
-    // Hanya jalankan jika detail buku dimuat dan kategori aman
-    enabled: !!bookDetail && !!safeCategory && safeCategory !== 'Unknown Category',
+    // Hanya jalankan jika detail buku sudah dimuat dan punya categoryId
+    enabled: !!bookDetail && !!categoryId,
   });
   
-  const relatedBooks = relatedData?.books?.filter(b => Number(b.id) !== bookId) || [];
+  // Filter buku yang sedang ditampilkan agar tidak muncul di Related Books
+  const relatedBooks = relatedBooksData?.filter(b => b.id !== id) || [];
 
-  // REVIEW DATA SIMPLIFIED
   const reviewsToDisplay = bookDetail?.reviews || [];
   const reviewsLength = reviewsToDisplay.length;
-
   const averageRating = bookDetail?.rating || 0;
   const totalReviewCount = bookDetail?.reviewCount || 0; 
   
   // === HANDLER TOMBOL BORROW ===
-  // Mengarahkan ke CheckoutPage dengan membawa data buku ini
   const handleBorrowNow = () => {
     if (!bookDetail) return;
 
     const checkoutItem = {
-        id: 0, // Temporary ID karena belum masuk cart database secara resmi
+        id: 0, 
         bookId: bookId,
         qty: 1,
         book: {
@@ -691,18 +217,14 @@ export default function BookDetailPage() {
         }
     };
 
-    // Navigasi ke Checkout dengan membawa state
     navigate('/checkout', { state: { checkoutItems: [checkoutItem] } });
   };
 
-
-  // ------------------------------------------
-  // ✅ MUTASI ADD TO CART
-  // ------------------------------------------
+  // === MUTASI ADD TO CART ===
   const { mutate: addToCart, isPending: isAddingToCart } = useMutation({
       mutationFn: () => apiClient.post(`/cart/items`, { 
-          bookId: bookId, // Menggunakan bookId (Number)
-          qty: 1, // Default quantity adalah 1
+          bookId: bookId, 
+          qty: 1, 
       }),
       
       onMutate: () => {
@@ -717,7 +239,6 @@ export default function BookDetailPage() {
 
       onSuccess: () => {
           toast.success('Add to cart successful', { description: 'Buku berhasil ditambahkan ke keranjang.' });
-          // Invalidate query cart agar badge cart di header terupdate
           queryClient.invalidateQueries({ queryKey: ['my-cart'] });
       },
   });
@@ -728,7 +249,6 @@ export default function BookDetailPage() {
   if (isDetailError) return <ErrorDisplay message={detailError?.message || 'Gagal memuat detail buku.'} />;
   if (!bookDetail) return <p className="text-center">Buku tidak ditemukan.</p>;
 
-  // --- STYLING CONSTANTS & SAFE ACCESS ---
   const TITLE_STYLE = { fontSize: '3.75rem', lineHeight: '1', letterSpacing: '-0.02em' }; 
   const CATEGORY_STYLE = { fontSize: '0.875rem', lineHeight: '1.25rem', letterSpacing: '-0.02em' }; 
   const AUTHOR_STYLE = { fontSize: '1rem', lineHeight: '1.5rem', letterSpacing: '-0.02em' }; 
@@ -736,7 +256,7 @@ export default function BookDetailPage() {
   const BUTTON_OUTLINE = '#D5D7DA';
   const MAX_WIDTH_CONTAINER = 1200;
   
-  const categoryLink = `/books?category=${encodeURIComponent(safeCategory)}`; 
+  const categoryLink = `/books?categoryId=${bookDetail.categoryId}`; // Update link menggunakan ID
 
   return (
     <div className="space-y-10">
@@ -745,7 +265,7 @@ export default function BookDetailPage() {
       <nav className="text-sm text-start text-muted-foreground">
         <Link to="/books" className="hover:underline">Home</Link>
         <span className="mx-2"> &gt; </span>
-        <Link to={categoryLink} className="hover:underline">{safeCategory}</Link>
+        <Link to={categoryLink} className="hover:underline">{categoryName}</Link>
         <span className="mx-2"> &gt; </span>
         <span className="text-foreground font-medium">{bookDetail.title}</span>
       </nav>
@@ -764,7 +284,7 @@ export default function BookDetailPage() {
                 <img 
                     src={bookDetail.coverImage}
                     alt={`Cover ${bookDetail.title}`}
-                    className="max-w-full max-h-full object-contain rounded-lg"
+                    className="w-full h-full object-cover rounded-lg"
                     style={{ width: '321px', height: '482px' }} 
                 />
             ) : (
@@ -777,28 +297,23 @@ export default function BookDetailPage() {
             )}
         </div>
 
-        {/* Kolom Kanan: Details - Ditambahkan text-left untuk memastikan rapat kiri */}
+        {/* Kolom Kanan: Details */}
         <div className="grow max-w-full lg:max-w-[760px] space-y-4 text-left">
             
-            {/* a. Book Category Name */}
             <p className="font-bold text-[#0A0D12]" style={CATEGORY_STYLE}>
-                {safeCategory.toUpperCase()}
+                {categoryName.toUpperCase()}
             </p>
             
-            {/* b. Book Title */}
             <h1 className="font-bold text-[#0A0D12]" style={TITLE_STYLE}>
                 {bookDetail.title}
             </h1>
 
-            {/* c. Book Author */}
             <p className="font-semibold text-gray-700" style={AUTHOR_STYLE}>
                 Oleh {bookDetail.Author}
             </p>
 
-            {/* d. Single Star icon + Book rating */}
             <StarRating rating={bookDetail.rating} />
 
-            {/* e. Number of page | Rating count | reviewCount */}
             <div className="flex space-x-6 text-muted-foreground text-sm font-medium pt-2">
                 <div className="flex items-center space-x-1">
                     <FileText className="w-4 h-4" />
@@ -816,19 +331,14 @@ export default function BookDetailPage() {
 
             <hr className="my-4 border-gray-200" />
             
-            {/* f. text "Description" */}
             <p className="font-bold text-lg">Description</p>
             
-            {/* g. Book Description */}
             <p className="text-base leading-relaxed text-gray-700">
                 {bookDetail.description}
             </p>
 
-            {/* h. Action Buttons (Perubahan di sini) */}
             <div className="flex items-center space-x-4 pt-6">
                 
-                {/* Borrow Book Button (Primary: #1C65DA) */}
-                {/* REVISI: Klik Borrow Book langsung navigasi ke Checkout */}
                 <Button 
                     onClick={handleBorrowNow} 
                     disabled={isAddingToCart || bookDetail.stock <= 0}
@@ -838,7 +348,6 @@ export default function BookDetailPage() {
                     {bookDetail.stock > 0 ? 'Borrow Book' : 'Out of Stock'}
                 </Button>
                 
-                {/* Add to Cart Button (Outline: #D5D7DA) */}
                 <Button 
                     onClick={() => addToCart()} 
                     variant="outline"
@@ -849,7 +358,6 @@ export default function BookDetailPage() {
                     {isAddingToCart ? 'Adding...' : 'Add to Cart'} 
                 </Button>
                 
-                {/* Share Icon Button */}
                 <Button 
                     variant="outline"
                     className="rounded-full flex items-center justify-center p-0"
@@ -857,19 +365,13 @@ export default function BookDetailPage() {
                 >
                     <Share2 className="w-5 h-5" />
                 </Button>
-                
-                
             </div>
         </div>
       </div>
       
       {/* Review Section */}
       <div className="space-y-6 pt-10">
-        
-        {/* 1. Garis pembatas horizontal */}
         <hr className="border border-gray-300" style={{ borderColor: BUTTON_OUTLINE }} />
-        
-        {/* a. Text: Review + b. Single star + rating + (jumlah review) */}
         <div className="flex text-start items-center h-full gap-4">
             <h2 className="text-3xl font-bold">Review</h2>
             <StarRating rating={averageRating} />
@@ -878,9 +380,7 @@ export default function BookDetailPage() {
             </span>
         </div>
         
-        {/* c. Review Grid (2 kolom, 3 baris) */}
         <div className="grid grid-cols-1 gap-6 h-full md:grid-cols-2">
-            
             {reviewsLength === 0 ? (
                 <p className="text-muted-foreground md:col-span-2">Belum ada ulasan untuk buku ini.</p>
             ) : (
@@ -888,20 +388,16 @@ export default function BookDetailPage() {
                     <ReviewCard key={review.id} review={review} />
                 ))
             )}
-            
             {reviewsLength > REVIEW_LIMIT && (
                 <div className="md:col-span-2 text-center pt-4">
                     <p className="text-muted-foreground">Hanya menampilkan ulasan awal dari detail buku.</p>
                 </div>
             )}
         </div>
-        
       </div>
 
       {/* Related Books Section */}
       <div className="space-y-6 pt-10">
-        
-        {/* 1. Text: "Related Books" */}
         <h2 className="font-bold text-[#0A0D12] text-left" 
             style={{ fontSize: '2rem', lineHeight: '1.2' }}>
             Related Books
@@ -918,7 +414,6 @@ export default function BookDetailPage() {
             <ErrorDisplay message={`Gagal memuat buku terkait.`} />
         )}
 
-        {/* 2. Grid berisi Book card */}
         {(!isRelatedPending && relatedBooks.length > 0) && (
             <div className={cn(
                 "grid gap-6",
