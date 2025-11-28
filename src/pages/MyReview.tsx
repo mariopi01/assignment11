@@ -286,7 +286,7 @@ export default function MyReviewPage() {
                         {/* Book Info Section */}
                         <div className="flex flex-row gap-6">
                             {/* Column 1: Cover Image */}
-                            <div className="shrink-0 w-[92px] h-[138px] bg-gray-200 rounded-md overflow-hidden shadow-sm flex items-center justify-center">
+                            <div className="shrink-0 w-[92px] h-[138px] bg-gray-200  overflow-hidden shadow-sm flex items-center justify-center">
                                 {coverImage ? (
                                     <img 
                                         src={coverImage} 
@@ -301,7 +301,7 @@ export default function MyReviewPage() {
                             {/* Column 2: Book Details */}
                             <div className="flex flex-col justify-center gap-1 text-left">
                                 {/* Category Name */}
-                                <p className="text-sm font-bold text-[#0A0D12] uppercase tracking-wide">
+                                <p className="text-sm font-bold text-[#0A0D12] uppercase tracking-wide border border-[#D5D7DA] rounded-md w-fit px-2 py-0.5">
                                     {categoryName}
                                 </p>
                                 

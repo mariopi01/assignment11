@@ -646,10 +646,11 @@ export default function CategoryPage() {
     // --- SIDEBAR FILTER ---
     const renderFilters = () => (
         <div className="w-full md:w-64 space-y-8 p-4 md:border rounded-xl md:h-full border-gray-200  shrink-0">
-            
+            <h2 className="font-bold text-lg text-foreground text-left">FILTER </h2>
+
             {/* Filter by Category */}
             <div className="space-y-3 border-b pb-4">
-                <h3 className="font-bold text-lg text-foreground">Filter by Category</h3>
+                <h3 className="font-bold text-lg text-foreground text-left ">Category</h3>
                 <div className="space-y-2">
                     {/* All Categories Option */}
                     <Button
@@ -707,7 +708,7 @@ export default function CategoryPage() {
 
             {/* Filter by Rating */}
             <div className="space-y-3">
-                <h3 className="font-bold text-lg text-foreground">Filter by Rating</h3>
+                <h3 className="font-bold text-lg text-foreground text-left">Rating</h3>
                 <div className="space-y-2">
                      {/* Any Rating Option */}
                      <Button

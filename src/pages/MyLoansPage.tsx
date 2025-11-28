@@ -383,7 +383,7 @@ const NavigationBox = () => {
                               {/* Details Column */}
                               <div className="flex-1 flex flex-col gap-1 w-full text-center md:text-left">
                                   {/* Category from fetched detail */}
-                                  <p className="text-sm font-bold text-[#0A0D12] uppercase tracking-wide">
+                                  <p className="text-sm font-bold text-[#0A0D12] uppercase tracking-wide border border-[#D5D7DA] rounded-md w-fit px-2 py-0.5">
                                       {categoryName}
                                   </p>
                                   

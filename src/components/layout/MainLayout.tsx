@@ -9,7 +9,7 @@ export const MainLayout = () => {
     <div className="min-h-screen flex flex-col">
       <Header />
 
-      <main className="grow container mx-auto px-4 py-8">
+      <main className="grow container mx-auto md-1 md:px-4 py-8">
         {/* Konten Halaman (seperti BookListPage) akan dirender di sini */}
         <Outlet /> 
       </main>

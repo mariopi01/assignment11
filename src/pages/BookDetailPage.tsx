@@ -973,22 +973,29 @@ const FiveStarRating = ({ stars }: { stars: number }) => (
 
 // Komponen Pembantu: Review Card
 const ReviewCard = ({ review }: { review: ReviewItem }) => {
-    const BUTTON_OUTLINE = '#D5D7DA';
     
     return (
-        <Card className="flex flex-col h-full text-start p-4 space-y-4 shadow-sm w-full" 
-              style={{ borderRadius: '16px' }}>
+        <Card className="flex flex-col h-full text-start p-4 space-y-1 shadow-sm w-full" 
+            style={{ borderRadius: '16px' }}>
             
-            <CardHeader className="p-0 flex flex-row items-center justify-between border-b pb-3" style={{borderColor: BUTTON_OUTLINE}}>
-                <div className="flex items-center space-x-3 overflow-hidden">
-                    <div className="w-10 h-10 shrink-0 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm">
-                        {review.User.name[0]?.toUpperCase() || 'U'}
-                    </div>
-                    <span className="font-bold text-base truncate">{review.User.name}</span>
+            {/* REVISI: Hapus 'border-b', 'pb-3', 'justify-between'. Tambahkan 'gap-3' */}
+            <CardHeader className="p-0 flex flex-row items-center gap-3">
+                
+                {/* Avatar */}
+                <div className="w-10 h-10 shrink-0 rounded-full bg-gray-200 flex items-center justify-center font-bold text-sm">
+                    {review.User.name[0]?.toUpperCase() || 'U'}
                 </div>
-                <span className="text-sm text-muted-foreground shrink-0 pl-2">
-                    {dayjs(review.createdAt).format('DD MMM YYYY')}
-                </span>
+
+                {/* REVISI: Container Baru (Nama & Tanggal) secara Vertikal */}
+                <div className="flex flex-col overflow-hidden">
+                    <span className="font-bold text-base truncate">
+                        {review.User.name}
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                        {dayjs(review.createdAt).format('DD MMMM YYYY, HH:mm')}
+                    </span>
+                </div>
+
             </CardHeader>
 
             <FiveStarRating stars={review.star} />
@@ -999,6 +1006,8 @@ const ReviewCard = ({ review }: { review: ReviewItem }) => {
                 </p>
             </CardContent>
         </Card>
+
+
     );
 };
 
@@ -1135,7 +1144,7 @@ export default function BookDetailPage() {
         style={{ maxWidth: `${MAX_WIDTH_CONTAINER}px` }} 
       >
         {/* Cover Image */}
-        <div className="shrink-0 p-2 flex items-center justify-center rounded-xl mx-auto lg:mx-0 bg-[#E9EAEB] w-full max-w-[300px] lg:w-[337px] h-auto aspect-2/3 lg:h-[498px]">
+        <div className="shrink-0 p-2 flex items-center justify-center  mx-auto lg:mx-0 bg-[#E9EAEB] w-full max-w-[300px] lg:w-[337px] h-auto aspect-2/3 lg:h-[498px]">
             {bookDetail.coverImage ? (
                 <img src={bookDetail.coverImage} alt={bookDetail.title} className="w-full h-full object-cover rounded-lg shadow-sm" />
             ) : (
