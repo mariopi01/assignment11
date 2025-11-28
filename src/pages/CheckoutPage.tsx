@@ -72,7 +72,7 @@ const CONTAINER_STYLE = {
   marginRight: 'auto',
   gap: '32px',
 };
-const DISPLAY_SM_BOLD = { fontFamily: 'Inter, sans-serif', fontWeight: 700, fontSize: '1.875rem', lineHeight: '2.375rem', letterSpacing: '-0.02em', color: '#0A0D12' };
+const DISPLAY_SM_BOLD = {  fontWeight: 700, fontSize: '1.875rem', lineHeight: '2.375rem', letterSpacing: '-0.02em', color: '#0A0D12' };
 const TEXT_SM_BOLD = { fontWeight: 700, fontSize: '0.875rem', lineHeight: '1.25rem', letterSpacing: '-0.02em', color: '#0A0D12' };
 const TEXT_MD_SEMIBOLD = { fontWeight: 600, fontSize: '1rem', lineHeight: '1.5rem', letterSpacing: '-0.02em', color: '#0A0D12' };
 const TEXT_MD_BOLD = { fontWeight: 700, fontSize: '1rem', lineHeight: '1.5rem', letterSpacing: '-0.02em', color: '#0A0D12' };

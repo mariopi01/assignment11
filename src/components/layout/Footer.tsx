@@ -25,7 +25,7 @@ export const Footer = () => {
     return (
         // Outer Container: width: 100%, height: 224px, justify-center & items-center (default untuk Flexbox di sini)
         <footer 
-            className="w-full border-t flex justify-center px-4"
+            className="w-full border-t flex justify-center px-4 py-6"
             style={{ height: '224px' }}
         >
             {/* Inner Content Container: flex 1 column, centered. */}

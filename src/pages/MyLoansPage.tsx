@@ -64,7 +64,7 @@ interface BookDetailResponse {
 
 // --- STYLING CONSTANTS ---
 const TITLE_STYLE = { 
-  fontFamily: 'Inter, sans-serif', 
+  
   fontWeight: 700, 
   fontSize: '1.875rem', // display-sm (~30px)
   lineHeight: '2.375rem', 
@@ -223,36 +223,43 @@ const NavigationBox = () => {
     
     return (
         <div 
-            className="flex gap-2 p-2 rounded-xl shrink-0 w-full md:w-[557px]" 
-          
-          style={{ height: '56px', background: '#F5F5F5' }}
-        >
-          
-            {TABS.map((tab) => {
-                const active = isActive(tab.path);
-                
-                return (
-                    <Link
-                        key={tab.name}
-                        to={tab.path}
-                        className="flex-1"
-                    >
-                        <Button
-                            asChild
-                            variant={active ? 'default' : 'ghost'}
-                            className={cn(
-                                "w-full h-full rounded-xl text-base font-bold text-[#0A0D12]",
-                                "hover:bg-white hover:text-[#0A0D12]",
-                                active && "bg-white text-[#0A0D12] hover:bg-white",
-                            )}
-                            style={active ? SHADOW_STYLE : {}}
-                        >
-                             <span>{tab.name}</span>
-                        </Button>
-                    </Link>
-                );
-            })}
-        </div>
+                  
+                  className="flex items-center gap-1 md:gap-2 p-1 md:p-2 rounded-xl shrink-0 w-full max-w-[557px] mx-auto md:mx-0 overflow-hidden" 
+                  
+                          style={{ height: '56px', background: '#F5F5F5' }}
+              >
+                  {TABS.map((tab) => {
+                      const active = isActive(tab.path);
+                      return (
+                          
+                          <Link key={tab.name} to={tab.path} className="flex-1 min-w-0 h-full">
+                              <Button
+                                  asChild
+                                  variant={active ? 'default' : 'ghost'}
+                                  className={cn(
+                                      "w-full h-full rounded-lg md:rounded-xl font-bold text-[#0A0D12]",
+                                      
+                                      // PERUBAHAN 4: Responsive Font Size
+                                      // text-xs (mobile) -> text-sm (tablet) -> text-base (desktop)
+                                      "text-xs sm:text-sm md:text-base",
+                                      
+                                      // Padding tombol responsif
+                                      "px-1 md:px-4",
+                                      
+                                      "hover:bg-white hover:text-[#0A0D12]",
+                                      active && "bg-white text-[#0A0D12] hover:bg-white",
+                                  )}
+                                  style={active ? SHADOW_STYLE : {}}
+                              >
+                                  
+                                  <span className="truncate w-full text-center">
+                                      {tab.name}
+                                  </span>
+                              </Button>
+                          </Link>
+                      );
+                  })}
+              </div>
     );
 };
 
@@ -296,19 +303,27 @@ const NavigationBox = () => {
           </div>
 
           {/* Status Filter Tabs */}
-          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+          <div className="flex gap-2 w-full max-w-[557px] mx-auto md:mx-0 overflow-x-auto no-scrollbar">
               {['All', 'Active', 'Returned', 'Overdue'].map((status) => (
                   <Button
                       key={status}
                       variant={statusFilter === status ? 'default' : 'outline'}
                       onClick={() => setStatusFilter(status)}
-                      className={`rounded-full h-9 px-4 font-medium transition-all ${
+                      className={cn(
+                          "rounded-full font-medium transition-all flex-1 min-w-0",
+                          // Responsive Height
+                          "h-8 md:h-9",
+                          // Responsive Padding
+                          "px-2 md:px-4",
+                          // Responsive Font
+                          "text-xs md:text-sm",
+                          
                           statusFilter === status 
                           ? 'bg-[#1C65DA] hover:bg-[#1C65DA]/90 text-white border-transparent' 
                           : 'bg-white text-[#414651] border-[#D5D7DA] hover:bg-gray-50'
-                      }`}
+                      )}
                   >
-                      {status}
+                      <span className="truncate">{status}</span>
                   </Button>
               ))}
           </div>

@@ -90,7 +90,7 @@ export const Header = () => {
 
         <Link to="/" className="flex items-center gap-2 shrink-0  ">
           <img src={logoBooky} alt="Booky Logo" className="w-[42px] h-[42px]" />
-          <span className="hidden md:block text-xl font-bold text-neutral-900">
+          <span className="hidden md:block text-4xl font-bold text-neutral-900">
             Booky
           </span>
         </Link>

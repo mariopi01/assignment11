@@ -123,7 +123,7 @@ export const Recommendation = () => {
     return (
         <div className="space-y-6">
             <h2 className="font-extrabold text-[#0A0D12] text-left" 
-                style={{ fontSize: '3rem', lineHeight: '1.2' }}>
+                style={{ fontSize: '1.5rem', lineHeight: '1.2' }}>
                 Recommendation
             </h2>
             

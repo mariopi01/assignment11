@@ -44,7 +44,7 @@ export const GiveReview = ({ bookId, isOpen, onClose }: GiveReviewProps) => {
   };
 
   const TITLE_STYLE = {
-    fontFamily: 'Inter, sans-serif',
+    
     fontWeight: 700,
     fontSize: '1.25rem', // display-xs (~20px)
     lineHeight: '1.75rem',
@@ -52,7 +52,7 @@ export const GiveReview = ({ bookId, isOpen, onClose }: GiveReviewProps) => {
   };
 
   const SUBTITLE_STYLE = {
-    fontFamily: 'Inter, sans-serif',
+    
     fontWeight: 700,
     fontSize: '1rem', // text-md
     lineHeight: '1.5rem',
@@ -147,7 +147,7 @@ export const GiveReview = ({ bookId, isOpen, onClose }: GiveReviewProps) => {
                     borderRadius: '12px',
                     border: '1px solid #D5D7DA',
                     padding: '12px',
-                    fontFamily: 'Inter, sans-serif',
+                    
                     fontWeight: 500,
                     fontSize: '1rem',
                     lineHeight: '1.5rem',

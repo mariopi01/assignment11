@@ -57,9 +57,8 @@ interface ApiError {
 
 // --- STYLING CONSTANTS ---
 const TITLE_STYLE = { 
-  fontFamily: 'Inter, sans-serif',
   fontWeight: 700, 
-  fontSize: '3rem', 
+  fontSize: '2rem', 
   lineHeight: '1.2', 
   color: '#0A0D12' 
 };
@@ -217,7 +216,7 @@ export default function MyCartPage() {
         <div className="flex-1 flex flex-col gap-4">
           
           {/* Header Checkbox */}
-          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border border-gray-100 shadow-sm">
+          <div className="flex items-center gap-3 p-4 bg-white rounded-xl ">
              <input 
                 type="checkbox" 
                 id="select-all"
@@ -243,7 +242,7 @@ export default function MyCartPage() {
                const coverImage = detail?.coverImage || item.book.coverImage;
 
                return (
-                 <div key={item.id} className="flex items-start gap-4 p-4 bg-white rounded-xl border border-gray-100 shadow-sm transition-all hover:shadow-md">
+                 <div key={item.id} className="flex items-start gap-4 p-4 bg-white border-b-2 transition-all hover:shadow-md">
                     <div className="pt-8"> 
                       <input 
                           type="checkbox" 
@@ -292,11 +291,11 @@ export default function MyCartPage() {
                     gap: '24px' 
                 }}
             >
-                <h2 className="font-bold text-xl text-[#0A0D12]">Loan Summary</h2>
+                <h2 className="font-bold text-xl text-left text-[#0A0D12]">Loan Summary</h2>
 
                 <div className="flex justify-between items-center">
                     <span className="text-base font-medium text-gray-600">Total Book</span>
-                    <span className="text-xl font-bold text-[#0A0D12]">{totalSelectedBooks}</span>
+                    <span className="text-xl font-bold text-[#0A0D12]">{totalSelectedBooks} Items</span>
                 </div>
 
                 <div className="flex flex-col gap-3 w-full">

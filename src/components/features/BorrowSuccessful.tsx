@@ -137,7 +137,7 @@ export const BorrowSuccessful = ({ returnDate }: BorrowSuccessfulProps) => {
 
   // Font: Display SM, Bold
   const TITLE_STYLE = {
-    fontFamily: 'Inter, sans-serif', // Menggunakan font default proyek
+    
     fontWeight: 700,
     fontStyle: 'normal',
     fontSize: '1.5rem', // display-sm (~30px)
@@ -149,7 +149,7 @@ export const BorrowSuccessful = ({ returnDate }: BorrowSuccessfulProps) => {
 
   // Font: Text LG, SemiBold
   const BODY_STYLE = {
-    fontFamily: 'Inter, sans-serif',
+    
     fontWeight: 600,
     fontStyle: 'normal',
     fontSize: '0.8rem', // text-lg (~18px)
