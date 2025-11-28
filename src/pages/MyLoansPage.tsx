@@ -279,7 +279,7 @@ const NavigationBox = () => {
       <h1 style={TITLE_STYLE} className="text-left">Borrowed List</h1>
 
       {/* 2. Search & Filter Bar */}
-      <div className="flex flex-col md:flex-row gap-4 justify-between items-start md:items-center">
+      <div className="flex flex-col md:flex-col gap-4 justify-between ">
           
           {/* Search Box */}
           <div className="relative" style={{ width: '544px', maxWidth: '100%' }}>
