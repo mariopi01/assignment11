@@ -223,10 +223,11 @@ const AuthorCard = ({ author }: { author: ExtendedAuthor }) => {
             className="block w-full" // UPDATE: Tambahkan w-full agar Link memenuhi lebar parent
         >
             <Card 
-                // UPDATE: Tambahkan w-full, card akan menyesuaikan grid
-                className="p-4 gap-4 grid grid-cols-2 hover:shadow-lg transition-shadow w-full"
+                // PERUBAHAN DI SINI:
+                // Mengganti 'grid grid-cols-2' menjadi 'flex flex-row items-center'
+                // Ini membuat teks langsung menempel setelah gap gambar, tidak terpaku di tengah kartu (50%)
+                className="p-4 gap-4 flex flex-row items-center hover:shadow-lg transition-shadow w-full"
                 style={{ 
-                    // HAPUS: width: '285px', agar tidak kaku/fixed
                     height: '113px', 
                     borderRadius: '12px', 
                     boxShadow: customShadow 
@@ -242,9 +243,9 @@ const AuthorCard = ({ author }: { author: ExtendedAuthor }) => {
                 </div>
 
                 {/* Right: Info container */}
-                <div className="flex flex-col justify-between h-full grow min-w-0 text-left"> 
+                <div className="flex flex-col justify-center h-full grow min-w-0 items-start text-left gap-1"> 
                     {/* Author Name */}
-                    <h3 className="font-semibold text-sm text-foreground truncate">
+                    <h3 className="font-semibold text-sm text-foreground truncate w-full">
                         {author.name}
                     </h3>
                     

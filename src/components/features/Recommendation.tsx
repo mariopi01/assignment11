@@ -65,7 +65,7 @@ const RecommendationCard = ({ book }: { book: RecommendedBook }) => {
                 )}
             </div>
             
-            <div className="p-4 flex flex-col space-y-1">
+            <div className="p-4  flex flex-col ">
                 <h3 className="font-bold text-lg leading-normal truncate text-foreground text-left" 
                     style={{ letterSpacing: '-0.03em' }}>
                     {book.title}
@@ -76,12 +76,12 @@ const RecommendationCard = ({ book }: { book: RecommendedBook }) => {
                     {book.Author?.name}
                 </p>
 
-                {/* PERUBAHAN DI SINI: Hanya menampilkan satu bintang dan nilai rating */}
+                
                 <div className="flex items-center space-x-1 pt-2">
                     {/* Tampilkan StarIcon yang 'terisi' jika rating > 0, jika tidak, kosong */}
                     <StarIcon filled={book.rating > 0} /> 
                     <span className="text-sm font-semibold text-foreground ml-1">
-                        {book.rating}/5 {/* Menampilkan nilai rating dan maksimumnya */}
+                        {book.rating} {/* Menampilkan nilai rating dan maksimumnya */}
                     </span>
                 </div>
             </div>
@@ -175,7 +175,7 @@ export const Recommendation = () => {
                         disabled={isFetching}
                         variant="outline"
                         className={cn(
-                            "w-[200px] h-12 rounded-full text-base", 
+                            "w-[200px]  h-12 rounded-full text-base", 
                             "border border-[#D5D7DA] bg-white hover:bg-gray-50 transition-colors"
                         )}
                     >

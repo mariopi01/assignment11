@@ -599,7 +599,7 @@ export default function CategoryPage() {
     const books = allBooks;
     const pagination = booksResponse?.pagination;
     const hasMore = pagination ? pagination.page < pagination.totalPages : false;
-    const TITLE_STYLE = { fontSize: '3rem', lineHeight: '1.2' }; 
+    const TITLE_STYLE = { fontSize: '2.5rem', lineHeight: '1.2' }; 
 
     const renderBookGrid = () => {
         const isInitialLoad = isBooksPending && page === 1;
@@ -645,10 +645,10 @@ export default function CategoryPage() {
     
     // --- SIDEBAR FILTER ---
     const renderFilters = () => (
-        <div className="w-full md:w-64 space-y-8 p-4 md:border-r border-gray-200 shrink-0">
+        <div className="w-full md:w-64 space-y-8 p-4 md:border rounded-xl md:h-full border-gray-200  shrink-0">
             
             {/* Filter by Category */}
-            <div className="space-y-3">
+            <div className="space-y-3 border-b pb-4">
                 <h3 className="font-bold text-lg text-foreground">Filter by Category</h3>
                 <div className="space-y-2">
                     {/* All Categories Option */}
@@ -772,7 +772,7 @@ export default function CategoryPage() {
 
     return (
         <div className="space-y-8">
-            <h1 className="font-extrabold text-[#0A0D12] text-left" style={TITLE_STYLE}>
+            <h1 className="font-bold text-[#0A0D12] text-left" style={TITLE_STYLE}>
                 Book List
             </h1>
             <div className="flex flex-col md:flex-row">
