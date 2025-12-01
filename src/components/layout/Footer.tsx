@@ -1,5 +1,5 @@
 
-// Import Assets (ada di folder src/assets/)
+
 import logoBooky from "@/assets/logo_booky.png";
 
 import facebookIcon from "@/assets/facebook.png"; 

@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
-/* Import Font Quicksand */
 @import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@300..700&display=swap');
 
 #root {
@@ -10,8 +9,6 @@
   padding: 2rem;
   text-align: center;
 }
-
-
 
 
 .logo {

@@ -1,5 +1,4 @@
 
-
 import React, { useState } from 'react'; 
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query'; 
@@ -41,8 +40,10 @@ export const Header = () => {
   const navigate = useNavigate();
   const { searchTerm } = useAppSelector(selectFilters);
 
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  // State
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false); // Untuk User Menu (Desktop & Mobile)
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false); 
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false); // Untuk Menu Burger (Login/Register)
 
   // === FETCH DATA CART (Untuk Badge) ===
   const { data: cartData } = useQuery<CartResponse>({
@@ -81,14 +82,20 @@ export const Header = () => {
     setIsDropdownOpen(false);
     navigate(path);
   };
+
+  const handleMobileMenuNavigation = (path: string) => {
+    setIsMobileMenuOpen(false);
+    navigate(path);
+  };
   
   return (
-    <nav className="bg-white sticky top-0 z-10 h-20">
-      <div className="container mx-auto px-4 h-full flex justify-between items-center">
+    // <nav> DIBERI Z-INDEX TINGGI
+    <nav className="bg-white sticky top-0 z-60 h-20 border-b border-gray-100">
+      {/* INDUK DENGAN RELATIVE & PADDING */}
+      <div className="container mx-auto px-4 h-full flex justify-between items-center relative">
         
-        {/* === KIRI: Logo & Nama === */}
-
-        <Link to="/" className="flex items-center gap-2 shrink-0  ">
+        {/* === KIRI: Logo & Nama (DIBERI Z-INDEX TERTINGGI agar tidak tertutup mobile search) === */}
+        <Link to="/" className="flex items-center gap-2 shrink-0 z-70">
           <img src={logoBooky} alt="Booky Logo" className="w-[42px] h-[42px]" />
           <span className="hidden md:block text-4xl font-bold text-neutral-900">
             Booky
@@ -109,50 +116,45 @@ export const Header = () => {
           />
         </div>
 
-        {/* === KANAN: Icons & User/Login === */}
-        <div className="flex items-center gap-3 relative justify-end">
-          
-          {/* --- MOBILE SEARCH VIEW (Aktif saat search icon diklik) --- */}
-          {isMobileSearchOpen ? (
-             <div className="flex items-center gap-2 md:hidden animate-in fade-in slide-in-from-right-5 duration-200">
-                {/* Search Box Mobile */}
-                <div 
-                    className="flex items-center w-auto bg-white border border-gray-300"
-                    style={{
-                         // Lebar tetap sesuai request
-                        height: '40px',
-                        gap: '6px',
-                        borderRadius: '9999px', 
-                        padding: '8px 12px',
-                        borderWidth: '1px'
-                    }}
-                >
-                    <img src={searchIcon} alt="Search" className="w-4 h-4 opacity-50" />
-                    <input
-                        type="text"
-                        placeholder="Search book"
-                        className="bg-transparent border-none outline-none w-full text-sm text-neutral-900 placeholder:text-neutral-500"
-                        value={searchTerm}
-                        onChange={handleSearchChange}
-                        onKeyDown={handleSearchSubmit}
-                        onFocus={handleSearchFocus}
-                        autoFocus 
-                    />
-                </div>
-
-                {/* Tombol X untuk tutup */}
+        {/* === KANAN: ICONS & USER/LOGIN ATAU MOBILE SEARCH BOX === */}
+        {isMobileSearchOpen ? (
+            // === KONDISI 1: MOBILE SEARCH BOX (Sejajar dengan Logo) ===
+            <div 
+                className="flex items-center gap-2 grow shrink-0 min-w-0 md:hidden ml-4"
+                style={{
+                    height: '40px',
+                    gap: '6px',
+                    borderRadius: '9999px', 
+                    padding: '8px 12px',
+                    border: '1px solid #d1d5db', 
+                }}
+            >
+                <img src={searchIcon} alt="Search" className="w-4 h-4 opacity-50 shrink-0" />
+                <input
+                    type="text"
+                    placeholder="Search book"
+                    className="bg-transparent border-none outline-none w-full text-sm text-neutral-900 placeholder:text-neutral-500 min-w-0"
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    onKeyDown={handleSearchSubmit}
+                    onFocus={handleSearchFocus}
+                    autoFocus 
+                />
+                
+                {/* Tombol X untuk tutup Search */}
                 <Button 
                     variant="ghost" 
                     size="icon" 
                     onClick={() => setIsMobileSearchOpen(false)}
-                    className="text-neutral-500 hover:bg-transparent shrink-0"
+                    className="text-neutral-500 hover:bg-transparent shrink-0 w-8 h-8 p-1"
                 >
                     <X className="w-6 h-6" />
                 </Button>
-             </div>
-          ) : (
-             // --- DEFAULT VIEW (Search Icon, Cart, User/Burger) ---
-             <>
+            </div>
+        ) : (
+            // === KONDISI 2: DEFAULT ICONS (Ikon Cart, User, Login, Register) ===
+            <div className="flex items-center gap-3 relative justify-end">
+                
                 {/* Ikon Pencarian (Mobile Trigger) */}
                 <Button 
                     variant="ghost" 
@@ -160,24 +162,15 @@ export const Header = () => {
                     className="md:hidden"
                     onClick={() => setIsMobileSearchOpen(true)}
                 >
-                    <img
-                    src={searchIconBlack}
-                    alt="Search"
-                    className="w-6 h-6"
-                    />
+                    <img src={searchIconBlack} alt="Search" className="w-6 h-6" />
                 </Button>
 
                 {isLoggedIn ? (
-                    // === TAMPILAN JIKA SUDAH LOGIN ===
+                    // === LOGGED IN VIEW ===
                     <>
                     <Link to="/cart">
                         <Button variant="ghost" size="icon" className="relative">
-                            <img
-                                src={cartIcon}
-                                alt="Cart"
-                                className="w-6 h-[25px]"
-                            />
-                            
+                            <img src={cartIcon} alt="Cart" className="w-6 h-[25px]" />
                             {/* CART BADGE */}
                             {cartCount > 0 && (
                                 <div 
@@ -191,7 +184,6 @@ export const Header = () => {
                                         gap: '6.67px',
                                         top: '-5px', 
                                         right: '-5px',
-                                        boxSizing: 'border-box' 
                                     }}
                                 >
                                     {cartCount > 99 ? '99+' : cartCount}
@@ -200,14 +192,10 @@ export const Header = () => {
                         </Button>
                     </Link>
 
-                    {/* Dropdown Toggle Area (Desktop) */}
+                    {/* Desktop: Name & Chevron */}
                     <div className="hidden md:flex items-center gap-2 relative">
                         <Link to="/profile">
-                            <img
-                                src={userAvatar}
-                                alt="User Avatar"
-                                className="w-12 h-12 rounded-full cursor-pointer"
-                            />
+                            <img src={userAvatar} alt="User Avatar" className="w-12 h-12 rounded-full cursor-pointer" />
                         </Link>
 
                         <div
@@ -227,11 +215,19 @@ export const Header = () => {
                         </div>
                     </div>
 
-                    {/* Dropdown Menu */}
+                    {/* Mobile: Avatar Clickable */}
+                    <div 
+                        className="md:hidden cursor-pointer"
+                        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                    >
+                        <img src={userAvatar} alt="User Avatar" className="w-10 h-10 rounded-full" />
+                    </div>
+
+                    {/* === DROPDOWN MENU (Shared Desktop & Mobile) === */}
                     {isDropdownOpen && (
                         <div 
-                        className="absolute top-full right-0 mt-4 bg-white border rounded-xl shadow-lg z-20 flex flex-col p-4 gap-2"
-                        style={{ width: '184px', ...SHADOW_STYLE }}
+                        className="absolute top-full right-0 mt-4 bg-white border rounded-xl shadow-lg z-50 flex flex-col p-4 gap-2"
+                        style={{ width: '200px', ...SHADOW_STYLE }}
                         >
                             <Button
                                 variant="ghost"
@@ -266,19 +262,11 @@ export const Header = () => {
                             </Button>
                         </div>
                     )}
-
-                    {/* Avatar Mobile */}
-                    <Link to="/profile" className="md:hidden">
-                        <img
-                        src={userAvatar}
-                        alt="User Avatar"
-                        className="w-10 h-10 rounded-full"
-                        />
-                    </Link>
                     </>
                 ) : (
-                    // === TAMPILAN JIKA BELUM LOGIN ===
+                    // === NOT LOGGED IN VIEW ===
                     <>
+                    {/* Desktop Buttons */}
                     <div className="hidden md:flex items-center gap-2">
                         <Button
                         variant="outline"
@@ -294,18 +282,46 @@ export const Header = () => {
                         Register
                         </Button>
                     </div>
-                    <Button variant="ghost" size="icon" className="md:hidden">
-                        <img
-                        src={burgerIcon}
-                        alt="Menu"
-                        className="w-6 h-6"
-                        />
+
+                    {/* Mobile Burger / X Trigger */}
+                    <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="md:hidden"
+                        onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                    >
+                        {isMobileMenuOpen ? (
+                               <X className="w-6 h-6 text-neutral-900" />
+                        ) : (
+                               <img src={burgerIcon} alt="Menu" className="w-6 h-6" />
+                        )}
                     </Button>
+
+                    {/* Mobile Menu (Login/Register Dropdown) */}
+                    {isMobileMenuOpen && (
+                        <div 
+                            className="absolute top-full right-0 mt-2 bg-white border rounded-xl p-4 flex flex-col gap-3 w-[200px] z-50 md:hidden"
+                            style={SHADOW_STYLE}
+                        >
+                            <Button
+                                variant="outline"
+                                className="w-full h-10 rounded-full border-neutral-300"
+                                onClick={() => handleMobileMenuNavigation('/login')}
+                            >
+                                Login
+                            </Button>
+                            <Button 
+                                className="w-full h-10 rounded-full bg-[#1C65DA] hover:bg-[#1C65DA]/90"
+                                onClick={() => handleMobileMenuNavigation('/register')}
+                            >
+                                Register
+                            </Button>
+                        </div>
+                    )}
                     </>
                 )}
-             </>
-          )}
-        </div>
+            </div>
+        )}
       </div>
     </nav>
   );

@@ -1,3 +1,4 @@
+
 import { useState, useEffect, useMemo } from 'react';
 import { useQuery, useQueries } from '@tanstack/react-query';
 import { useLocation, Link } from 'react-router-dom';
@@ -133,8 +134,8 @@ export default function MyLoansPage() {
       };
       
       if (statusFilter !== 'All') {
-         if (statusFilter === 'Active') params.status = 'BORROWED';
-         if (statusFilter === 'Returned') params.status = 'RETURNED';
+          if (statusFilter === 'Active') params.status = 'BORROWED';
+          if (statusFilter === 'Returned') params.status = 'RETURNED';
       }
       
       if (debouncedSearch) {
@@ -223,43 +224,42 @@ const NavigationBox = () => {
     
     return (
         <div 
-                  
-                  className="flex items-center gap-1 md:gap-2 p-1 md:p-2 rounded-xl shrink-0 w-full max-w-[557px] mx-auto md:mx-0 overflow-hidden" 
-                  
-                          style={{ height: '56px', background: '#F5F5F5' }}
-              >
-                  {TABS.map((tab) => {
-                      const active = isActive(tab.path);
-                      return (
-                          
-                          <Link key={tab.name} to={tab.path} className="flex-1 min-w-0 h-full">
-                              <Button
-                                  asChild
-                                  variant={active ? 'default' : 'ghost'}
-                                  className={cn(
-                                      "w-full h-full rounded-lg md:rounded-xl font-bold text-[#0A0D12]",
-                                      
-                                      // PERUBAHAN 4: Responsive Font Size
-                                      // text-xs (mobile) -> text-sm (tablet) -> text-base (desktop)
-                                      "text-xs sm:text-sm md:text-base",
-                                      
-                                      // Padding tombol responsif
-                                      "px-1 md:px-4",
-                                      
-                                      "hover:bg-white hover:text-[#0A0D12]",
-                                      active && "bg-white text-[#0A0D12] hover:bg-white",
-                                  )}
-                                  style={active ? SHADOW_STYLE : {}}
-                              >
-                                  
-                                  <span className="truncate w-full text-center">
-                                      {tab.name}
-                                  </span>
-                              </Button>
-                          </Link>
-                      );
-                  })}
-              </div>
+                        
+                        className="flex items-center gap-1 md:gap-2 p-1 md:p-2 rounded-xl shrink-0 w-full max-w-[557px] mx-auto md:mx-0 overflow-hidden" 
+                        
+                            style={{ height: '56px', background: '#F5F5F5' }}
+                    >
+                        {TABS.map((tab) => {
+                            const active = isActive(tab.path);
+                            return (
+                                
+                                <Link key={tab.name} to={tab.path} className="flex-1 min-w-0 h-full">
+                                    <Button
+                                        asChild
+                                        variant={active ? 'default' : 'ghost'}
+                                        className={cn(
+                                            "w-full h-full rounded-lg md:rounded-xl font-bold text-[#0A0D12]",
+                                            
+                                            // Responsive Font Size
+                                            "text-xs sm:text-sm md:text-base",
+                                            
+                                            // Padding tombol responsif
+                                            "px-1 md:px-4",
+                                            
+                                            "hover:bg-white hover:text-[#0A0D12]",
+                                            active && "bg-white text-[#0A0D12] hover:bg-white",
+                                        )}
+                                        style={active ? SHADOW_STYLE : {}}
+                                    >
+                                        
+                                        <span className="truncate w-full text-center">
+                                            {tab.name}
+                                        </span>
+                                    </Button>
+                                </Link>
+                            );
+                        })}
+                    </div>
     );
 };
 
@@ -365,52 +365,73 @@ const NavigationBox = () => {
                           </div>
 
                           {/* Body Content */}
-                          <div className="p-6 flex flex-col md:flex-row gap-6 items-center md:items-start">
+                          {/* KRITIS: Ubah ini menjadi flex-col di mobile agar Action Column turun ke bawah */}
+                          <div className="p-6 flex flex-col gap-6 items-center md:items-start">
                               
-                              {/* Book Cover */}
-                              <div className="shrink-0 w-[92px] h-[138px] bg-gray-200 rounded-md overflow-hidden shadow-sm flex items-center justify-center">
-                                  {loan.Book.coverImage ? (
-                                      <img 
-                                          src={loan.Book.coverImage} 
-                                          alt={loan.Book.title} 
-                                          className="w-full h-full object-cover" 
-                                      />
-                                  ) : (
-                                      <BookOpen className="w-8 h-8 text-gray-400" />
-                                  )}
-                              </div>
-
-                              {/* Details Column */}
-                              <div className="flex-1 flex flex-col gap-1 w-full text-center md:text-left">
-                                  {/* Category from fetched detail */}
-                                  <p className="text-sm font-bold text-[#0A0D12] uppercase tracking-wide border border-[#D5D7DA] rounded-md w-fit px-2 py-0.5">
-                                      {categoryName}
-                                  </p>
+                              {/* === KELOMPOK 1: COVER + DETAILS + DESKTOP BUTTON (Selalu sejajar) === */}
+                              {/* flex-row: Membuat Cover dan Details/Button sejajar di semua ukuran (Mobile dan Desktop) */}
+                              <div className="flex flex-row gap-4 items-start w-full">
                                   
-                                  {/* Title */}
-                                  <h3 className="text-xl font-bold text-[#0A0D12] leading-tight mb-1">
-                                      {loan.Book.title}
-                                  </h3>
-                                  
-                                  {/* Author from fetched detail */}
-                                  <p className="text-base font-medium text-[#414651]">
-                                      {authorName}
-                                  </p>
+                                  {/* Book Cover (Kiri) */}
+                                  <div className="shrink-0 w-[92px] h-[138px] bg-gray-200 rounded-md overflow-hidden shadow-sm flex items-center justify-center">
+                                      {loan.Book.coverImage ? (
+                                          <img 
+                                              src={loan.Book.coverImage} 
+                                              alt={loan.Book.title} 
+                                              className="w-full h-full object-cover" 
+                                          />
+                                      ) : (
+                                          <BookOpen className="w-8 h-8 text-gray-400" />
+                                      )}
+                                  </div>
 
-                                  {/* Duration Info */}
-                                  <div className="mt-3 pt-3 border-t border-dashed border-gray-200 inline-flex items-center gap-2 text-[#0A0D12] font-bold text-base">
-                                       <span>{dayjs(loan.borrowedAt).format('DD MMM YYYY')}</span>
-                                       <span className="w-1 h-1 bg-gray-400 rounded-full mx-1"></span>
-                                       <span>Duration {durationDays} Days</span>
+                                  {/* Details Column (Kanan Cover) */}
+                                  <div className="flex-1 flex flex-col gap-1 w-full text-left">
+                                      {/* Category from fetched detail */}
+                                      <p className="text-sm font-bold text-[#0A0D12] uppercase tracking-wide border border-[#D5D7DA] rounded-md w-fit px-2 py-0.5">
+                                          {categoryName}
+                                      </p>
+                                      
+                                      {/* Title */}
+                                      <h3 className="text-xl font-bold text-[#0A0D12] leading-tight mb-1">
+                                          {loan.Book.title}
+                                      </h3>
+                                      
+                                      {/* Author from fetched detail */}
+                                      <p className="text-base font-medium text-[#414651]">
+                                          {authorName}
+                                      </p>
+
+                                      {/* Duration Info */}
+                                      <div className="mt-3 pt-3 border-t border-dashed border-gray-200 inline-flex items-center gap-0 text-[#0A0D12] font-bold text-xs md:text-base">
+                                              <span>{dayjs(loan.borrowedAt).format('DD MMM YYYY')}</span>
+                                              <span className="w-1 h-1 bg-gray-400 rounded-full mx-1"></span>
+                                              <span>Duration {durationDays} Days</span>
+                                      </div>
+                                  </div>
+
+                                  {/* Action Column (Desktop Only) */}
+                                  <div className="hidden md:flex shrink-0 flex-col justify-center h-full pt-2 md:pt-0">
+                                      <Button 
+                                          className="rounded-full font-semibold text-white shadow-none hover:opacity-90"
+                                          style={{ 
+                                              width: '182px', 
+                                              height: '40px', 
+                                              background: '#1C65DA' 
+                                          }}
+                                          onClick={() => handleOpenReview(loan.bookId)} // Trigger Modal
+                                      >
+                                          Give Review
+                                      </Button>
                                   </div>
                               </div>
+                              {/* === AKHIR KELOMPOK 1 === */}
 
-                              {/* Action Column (Right) */}
-                              <div className="shrink-0 flex flex-col justify-center h-full pt-2 md:pt-0">
+                              {/* === KELOMPOK 2: MOBILE ACTION BUTTON (Hanya tampil di mobile, w-full) === */}
+                              <div className="md:hidden w-full">
                                   <Button 
-                                      className="rounded-full font-semibold text-white shadow-none hover:opacity-90"
+                                      className="rounded-full font-semibold text-white shadow-none hover:opacity-90 w-full"
                                       style={{ 
-                                          width: '182px', 
                                           height: '40px', 
                                           background: '#1C65DA' 
                                       }}
@@ -421,6 +442,7 @@ const NavigationBox = () => {
                               </div>
 
                           </div>
+                          {/* AKHIR BODY CONTENT */}
                       </Card>
                   );
               })}

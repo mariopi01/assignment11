@@ -1,15 +1,15 @@
 
-// // src/pages/MyCart.tsx
 
 // import { useState, useMemo } from 'react';
 // import { useQuery, useQueries, useMutation, useQueryClient } from '@tanstack/react-query';
 // import { useNavigate } from 'react-router-dom';
 // import apiClient from '@/api';
 // import { Button } from '@/components/ui/button';
-// import { Card } from '@/components/ui/card';
+// // import { Card } from '@/components/ui/card'; // Card tidak digunakan secara langsung untuk fleksibilitas styling responsif
 // import { Loader2, TriangleAlert, BookOpen, Trash2 } from 'lucide-react';
 // import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 // import { toast } from 'sonner';
+// import { cn } from '@/lib/utils'; // Pastikan cn diimport
 
 // // --- TIPE DATA API CART ---
 // interface CartItem {
@@ -206,7 +206,8 @@
 //   if (isCartError) return <ErrorDisplay message={cartError?.message || 'Gagal memuat keranjang.'} />;
 
 //   return (
-//     <div className="flex flex-col px-4 pb-12 min-h-screen" style={CONTAINER_STYLE}>
+//     // Tambahkan pb-24 agar konten tidak tertutup fixed bottom bar di mobile
+//     <div className="flex flex-col px-4 pb-24 lg:pb-12 min-h-screen" style={CONTAINER_STYLE}>
       
 //       <h1 style={TITLE_STYLE} className="text-left">My Cart</h1>
 
@@ -231,7 +232,7 @@
 
 //           {/* Items List */}
 //           {cartItems.length === 0 ? (
-//              <div className="text-center py-10 text-muted-foreground bg-gray-50 rounded-xl border border-dashed">
+//              <div className="text-center py-10 text-muted-foreground  rounded-xl ">
 //                 Keranjang kosong.
 //              </div>
 //           ) : (
@@ -242,7 +243,7 @@
 //                const coverImage = detail?.coverImage || item.book.coverImage;
 
 //                return (
-//                  <div key={item.id} className="flex items-start gap-4 p-4 bg-white border-b-2 transition-all hover:shadow-md">
+//                  <div key={item.id} className="flex items-start gap-4 p-4 bg-white rounded-xl  transition-all hover:shadow-md">
 //                     <div className="pt-8"> 
 //                       <input 
 //                           type="checkbox" 
@@ -262,7 +263,7 @@
 //                         </div>
 
 //                         <div className="flex flex-col justify-center space-y-1 text-left">
-//                             <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide">
+//                             <p className="text-sm text-muted-foreground font-medium uppercase tracking-wide border w-fit rounded-md mx-0.5 p-1">
 //                                 {categoryName}
 //                             </p>
 //                             <h3 className="text-xl font-bold text-[#0A0D12] line-clamp-2">
@@ -279,64 +280,70 @@
 //           )}
 //         </div>
 
-//         {/* Kolom Kanan: Summary */}
-//         <div className="shrink-0">
-//             <Card 
-//                 className="flex flex-col bg-white border border-gray-200 shadow-sm"
-//                 style={{ 
-//                     width: '318px', 
-//                     minHeight: '200px', 
-//                     borderRadius: '16px', 
-//                     padding: '20px', 
-//                     gap: '24px' 
-//                 }}
-//             >
-//                 <h2 className="font-bold text-xl text-left text-[#0A0D12]">Loan Summary</h2>
+//         {/* LOAN SUMMARY SECTION 
+//             - Mobile: Fixed Bottom, 2 Columns, No Border, White BG.
+//             - Desktop: Static Card, Sidebar style.
+//         */}
+//         <div 
+//             className={cn(
+//                 // Mobile Styles
+//                 "fixed bottom-0 left-0 right-0 bg-white p-4 z-50 flex flex-row justify-between items-center shadow-[0_-4px_10px_rgba(0,0,0,0.05)]",
+//                 // Desktop Styles overrides (mengembalikan ke bentuk Card)
+//                 "lg:static lg:flex-col lg:items-stretch lg:w-[318px] lg:min-h-[200px] lg:rounded-2xl lg:border lg:border-gray-200 lg:shadow-sm lg:p-5 lg:gap-6"
+//             )}
+//         >
+//             {/* Title hanya di Desktop */}
+//             <h2 className="hidden lg:block font-bold text-xl text-[#0A0D12] text-left">Loan Summary</h2>
 
-//                 <div className="flex justify-between items-center">
-//                     <span className="text-base font-medium text-gray-600">Total Book</span>
-//                     <span className="text-xl font-bold text-[#0A0D12]">{totalSelectedBooks} Items</span>
-//                 </div>
+//             {/* Col 1: Text Total Book */}
+//             <div className="flex flex-col items-start lg:flex-row lg:justify-between lg:items-center">
+//                 <span className="text-sm font-medium text-gray-600 lg:text-base">Total Book</span>
+//                 <span className="text-xl font-bold text-[#0A0D12]">{totalSelectedBooks} Items</span>
+//             </div>
 
-//                 <div className="flex flex-col gap-3 w-full">
-//                     {/* Button Borrow Book */}
-//                     <Button 
-//                         onClick={handleBorrowClick}
-//                         disabled={totalSelectedBooks === 0}
-//                         className="w-full text-white font-semibold shadow-none hover:opacity-90 transition-opacity"
-//                         style={{ 
-//                             width: '100%', 
-//                             height: '48px', 
-//                             borderRadius: '100px', 
-//                             padding: '8px',
-//                             background: '#1C65DA',
-//                         }}
-//                     >
-//                         Borrow Book
-//                     </Button>
+//             {/* Col 2: Action Buttons */}
+//             <div className="flex flex-col gap-3 lg:w-full">
+//                 {/* Button Borrow Book */}
+//                 <Button 
+//                     onClick={handleBorrowClick}
+//                     disabled={totalSelectedBooks === 0}
+//                     className={cn(
+//                         "font-semibold text-white shadow-none hover:opacity-90 transition-opacity",
+//                         // Mobile Size
+//                         "w-[150px] h-10 rounded-[100px] text-sm",
+//                         // Desktop Size override
+//                         "lg:w-full lg:h-12 lg:text-base"
+//                     )}
+//                     style={{ 
+//                         padding: '8px',
+//                         background: '#1C65DA',
+//                         gap: '8px'
+//                     }}
+//                 >
+//                     Borrow Book
+//                 </Button>
 
-//                     {/* Button Empty My Cart */}
-//                     <Button 
-//                         onClick={handleEmptyCart}
-//                         disabled={isEmptying || cartItems.length === 0}
-//                         variant="outline"
-//                         className="w-full font-semibold border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
-//                         style={{ 
-//                             width: '100%', 
-//                             height: '48px', 
-//                             borderRadius: '100px', 
-//                             padding: '8px',
-//                         }}
-//                     >
-//                         {isEmptying ? (
-//                             <Loader2 className="w-4 h-4 animate-spin mr-2" />
-//                         ) : (
-//                             <Trash2 className="w-4 h-4 mr-2" />
-//                         )}
-//                         Empty My Cart
-//                     </Button>
-//                 </div>
-//             </Card>
+//                 {/* Button Empty Cart (Hanya tampil di Desktop untuk menghemat ruang di mobile bar 2 kolom) */}
+//                 <Button 
+//                     onClick={handleEmptyCart}
+//                     disabled={isEmptying || cartItems.length === 0}
+//                     variant="outline"
+//                     className="hidden lg:flex w-full font-semibold border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
+//                     style={{ 
+//                         width: '100%', 
+//                         height: '48px', 
+//                         borderRadius: '100px', 
+//                         padding: '8px',
+//                     }}
+//                 >
+//                     {isEmptying ? (
+//                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
+//                     ) : (
+//                         <Trash2 className="w-4 h-4 mr-2" />
+//                     )}
+//                     Empty My Cart
+//                 </Button>
+//             </div>
 //         </div>
 
 //       </div>
@@ -345,18 +352,16 @@
 // }
 
 
-// src/pages/MyCart.tsx
-
 import { useState, useMemo } from 'react';
 import { useQuery, useQueries, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
 import apiClient from '@/api';
 import { Button } from '@/components/ui/button';
-// import { Card } from '@/components/ui/card'; // Card tidak digunakan secara langsung untuk fleksibilitas styling responsif
 import { Loader2, TriangleAlert, BookOpen, Trash2 } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from 'sonner';
-import { cn } from '@/lib/utils'; // Pastikan cn diimport
+import { cn } from '@/lib/utils'; 
+
 
 // --- TIPE DATA API CART ---
 interface CartItem {
@@ -393,7 +398,7 @@ interface BookDetailResponse {
   };
 }
 
-// Tambahkan Interface untuk Error API
+// Interface untuk Error API
 interface ApiError {
   response?: {
     data?: {
@@ -448,7 +453,6 @@ export default function MyCartPage() {
     },
   });
 
-  // FIX: Memoize cartItems untuk menstabilkan referensi dependensi
   const cartItems = useMemo(() => cartData?.items || [], [cartData]);
 
   // === 2. FETCH BOOK DETAILS (Author & Category) PARALEL ===
@@ -534,7 +538,6 @@ export default function MyCartPage() {
       setSelectedItems(new Set()); 
       queryClient.invalidateQueries({ queryKey: ['my-cart'] }); 
     },
-    // FIX: Menggunakan tipe ApiError alih-alih any
     onError: (error: ApiError) => {
       toast.error('Gagal Mengosongkan Keranjang', { 
         description: error.response?.data?.message || 'Terjadi kesalahan saat menghapus keranjang.'
@@ -553,8 +556,8 @@ export default function MyCartPage() {
   if (isCartError) return <ErrorDisplay message={cartError?.message || 'Gagal memuat keranjang.'} />;
 
   return (
-    // Tambahkan pb-24 agar konten tidak tertutup fixed bottom bar di mobile
-    <div className="flex flex-col px-4 pb-24 lg:pb-12 min-h-screen" style={CONTAINER_STYLE}>
+    // FIX: Ubah pb-24 menjadi pb-40 agar konten tidak tertutup fixed bottom bar yang lebih tinggi di mobile
+    <div className="flex flex-col px-4 pb-40 lg:pb-12 min-h-screen" style={CONTAINER_STYLE}>
       
       <h1 style={TITLE_STYLE} className="text-left">My Cart</h1>
 
@@ -627,15 +630,12 @@ export default function MyCartPage() {
           )}
         </div>
 
-        {/* LOAN SUMMARY SECTION 
-            - Mobile: Fixed Bottom, 2 Columns, No Border, White BG.
-            - Desktop: Static Card, Sidebar style.
-        */}
+        {/* LOAN SUMMARY SECTION */}
         <div 
             className={cn(
                 // Mobile Styles
                 "fixed bottom-0 left-0 right-0 bg-white p-4 z-50 flex flex-row justify-between items-center shadow-[0_-4px_10px_rgba(0,0,0,0.05)]",
-                // Desktop Styles overrides (mengembalikan ke bentuk Card)
+                // Desktop Styles overrides
                 "lg:static lg:flex-col lg:items-stretch lg:w-[318px] lg:min-h-[200px] lg:rounded-2xl lg:border lg:border-gray-200 lg:shadow-sm lg:p-5 lg:gap-6"
             )}
         >
@@ -649,7 +649,8 @@ export default function MyCartPage() {
             </div>
 
             {/* Col 2: Action Buttons */}
-            <div className="flex flex-col gap-3 lg:w-full">
+            {/* FIX: gap-2 untuk mobile, items-end agar tombol rata kanan di mobile */}
+            <div className="flex flex-col gap-2 items-end lg:gap-3 lg:items-stretch lg:w-full">
                 {/* Button Borrow Book */}
                 <Button 
                     onClick={handleBorrowClick}
@@ -670,18 +671,18 @@ export default function MyCartPage() {
                     Borrow Book
                 </Button>
 
-                {/* Button Empty Cart (Hanya tampil di Desktop untuk menghemat ruang di mobile bar 2 kolom) */}
+                {/* Button Empty Cart */}
                 <Button 
                     onClick={handleEmptyCart}
                     disabled={isEmptying || cartItems.length === 0}
                     variant="outline"
-                    className="hidden lg:flex w-full font-semibold border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors"
-                    style={{ 
-                        width: '100%', 
-                        height: '48px', 
-                        borderRadius: '100px', 
-                        padding: '8px',
-                    }}
+                    className={cn(
+                        // Base styles (Mobile)
+                        // FIX: Tampilkan flex di semua view, set width/height mobile agar konsisten dengan tombol Borrow
+                        "flex w-[150px] h-10 rounded-[100px] text-sm font-semibold border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700 transition-colors",
+                        // Desktop overrides
+                        "lg:w-full lg:h-12 lg:text-base"
+                    )}
                 >
                     {isEmptying ? (
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />

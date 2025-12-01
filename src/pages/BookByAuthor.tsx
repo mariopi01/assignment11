@@ -4,9 +4,10 @@ import { useQuery } from '@tanstack/react-query';
 import apiClient from '@/api';
 import { cn } from '@/lib/utils';
 import { Card } from '@/components/ui/card';
-import { Loader2, BookOpen, TriangleAlert } from 'lucide-react';
+import { Loader2, TriangleAlert } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { BookCard } from '@/components/features/BookCard';
+import bookIcon from '@/assets/Book_icon.png';
 
 import authorImage from '@/assets/author1.png'; 
 
@@ -128,7 +129,11 @@ export default function BookByAuthorPage() {
                         
                         {/* Number of Books Written */}
                         <div className="flex items-center text-muted-foreground text-base space-x-1">
-                            <BookOpen className="w-5 h-5 text-primary" />
+                            <img 
+                                src={bookIcon} 
+                                alt="Book Icon" 
+                                className="w-5 h-5 object-contain" 
+                            />
                             <span>{bookCount} Books </span>
                         </div>
                     </div>
